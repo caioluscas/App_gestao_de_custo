@@ -1,9 +1,13 @@
-import 'react-native-reanimated';
-import Home from "./src/pages/Home";
+import { StatusBar } from 'react-native';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import Routes from './src/routes';
 
 export default function App() {
   return (
-    <Home />
+    <NavigationContainer>
+      <StatusBar backgroundColor="#38A69D" barStyle="light-content"/>
+      <Routes/>
+    </NavigationContainer>
   );
 }
-

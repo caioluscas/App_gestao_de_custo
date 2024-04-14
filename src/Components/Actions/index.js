@@ -48,8 +48,9 @@ export default function Actions() {
         </View>
         <Text style={styles.labelButton}>Conta</Text>
     </TouchableOpacity>
-
+    
    </ScrollView>
+   
    
    
   );
@@ -57,7 +58,7 @@ export default function Actions() {
 
 const styles = StyleSheet.create({
     container:{
-        maxHeight: 84,
+        maxHeight: 100,
         marginBottom: 14,
         marginTop: 18,
         paddingEnd: 14,
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
     },
     actionButton:{
         alignItems: 'center',
-        marginRight: 32
+        marginRight: 32,
     },
     areaButton:{
         backgroundColor: '#ecf0f1',
@@ -79,5 +80,6 @@ const styles = StyleSheet.create({
         marginTop: 4,
         textAlign: 'center',
         fontWeight: 'bold',
+        flexWrap: 'wrap',
     }
 })

@@ -60,7 +60,8 @@ const styles = StyleSheet.create({
         flex:1,
         marginBottom: 24,
         borderBottomWidth: 0.5,
-        borderBottomColor: '#DADADA'
+        borderBottomColor: '#DADADA',
+        
     },
     content:{
         flexDirection: 'row',

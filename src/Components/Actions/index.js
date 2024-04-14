@@ -75,11 +75,13 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
+        
     },
     labelButton:{
         marginTop: 4,
         textAlign: 'center',
         fontWeight: 'bold',
         flexWrap: 'wrap',
+        marginBottom: 30,
     }
 })

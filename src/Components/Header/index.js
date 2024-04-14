@@ -25,7 +25,6 @@ export default function Header({ name }){
                 duration: 800,
                 delay: 300,
             }}
-            
             >
 
                 <MotiText 

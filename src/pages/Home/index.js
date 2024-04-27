@@ -11,28 +11,28 @@ const list = [
   {
     id: 1,
     label: 'Avon conta',
-    value: '232.15',
+    value: '50.00',
     date: '13/04/2024',
     type:0
   },
   {
     id: 2,
     label: 'Steam conta',
-    value: '122.10',
+    value: '200.00',
     date: '14/04/2024',
     type:0
   },
   {
     id: 3,
     label: 'Enel conta',
-    value: '505.35',
+    value: '150.00',
     date: '15/04/2024',
     type:0
   },
   {
     id: 4,
     label: 'Mercado conta',
-    value: '90.90',
+    value: '44.00',
     date: '16/04/2024',
     type:0
   },
@@ -46,7 +46,7 @@ const list = [
   {
     id: 6,
     label: 'Pix Dona Jô',
-    value: '250.00',
+    value: '25980.10',
     date: '17/04/2024',
     type:1
   }
@@ -58,7 +58,7 @@ export default function Home() {
     <View style={styles.container}>
       <Header name="Caio Lucas"/>
 
-      <Balance saldo="9250.90" gastos="444"/>
+      <Balance saldo="28980.10" gastos="444"/>
 
       <Actions/>
 

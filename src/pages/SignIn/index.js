@@ -1,44 +1,71 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import React from 'react';
-
-import * as Animatable from 'react-native-animatable'
-import { FadeInLeft, FadeInUp } from 'react-native-reanimated';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import { colorKeys } from 'moti';
 
 export default function SignIn() {
   const navigation = useNavigation();
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
+  const [token, setToken] = useState('');
+  const [showIncorrectCredentials, setShowIncorrectCredentials] = useState(false); // Estado para controlar a visibilidade da mensagem
+ 
+  const handleSignIn = async () => {
+    try {
+      const response = await axios.post('http://localhost:8080/auth/login', {
+        login: login,
+        password: password
+      });
+      
+      setToken(response.data.token)
+      setShowIncorrectCredentials(false);
+      navigation.navigate('Home');
 
- return (
-   <View style={styles.container}>
+    } catch (error) {
+      setShowIncorrectCredentials(true);
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login.');
+      navigation.navigate('SignIn');
+    }
+  };
 
-    <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
-      <Text style={styles.message}>Bem-vindo</Text>
-    </Animatable.View>
+  return (
+    <View style={styles.container}>
+      <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
+        <Text style={styles.message}>Bem-vindo</Text>
+      </Animatable.View>
 
-    <Animatable.View animation="fadeInUp" style={styles.containerForm}>
-      <Text style={styles.title}>Email</Text>
-      <TextInput 
-      placeholder='Digite um email' 
-      style={styles.input}
-      />
+      <Animatable.View animation="fadeInUp" style={styles.containerForm}>
+        <Text style={styles.title}>Login</Text>
+        <TextInput
+          placeholder='Digite um login'
+          style={styles.input}
+          value={login}
+          onChangeText={text => setLogin(text)}
+        />
 
-      <Text style={styles.title}>Senha</Text>
-      <TextInput 
-      placeholder='Digite sua senha' 
-      style={styles.input}
-      />
+        <Text style={styles.title}>Senha</Text>
+        <TextInput
+          placeholder='Digite sua senha'
+          style={styles.input}
+          secureTextEntry={true}
+          value={password}
+          onChangeText={text => setPassword(text)}
+        />
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
-        <Text style={styles.buttonText}>Acessar</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+          <Text style={styles.buttonText}>Acessar</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.buttonRegister} onPress={() => navigation.navigate('SignUp')}>
-        <Text style={styles.registerText}>Não possui uma conta? Cadastre-se</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.buttonRegister} onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.registerText}>Não possui uma conta? Cadastre-se</Text>
+        </TouchableOpacity>
 
-    </Animatable.View>
-    
-   </View>
+        {showIncorrectCredentials && <Text style={styles.alertText}>Credenciais incorretas</Text>}
+
+      </Animatable.View>
+    </View>
   );
 }
 
@@ -80,7 +107,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 4,
     paddingVertical: 8,
-    margintop: 14,
+    marginTop: 14,
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -95,5 +122,9 @@ const styles = StyleSheet.create({
   },
   registerText:{
     color: '#a1a1a1'
+  },
+  alertText:{
+    color: '#FF0000',
+    alignSelf: 'center'
   }
 })

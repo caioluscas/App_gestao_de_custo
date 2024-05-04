@@ -3,52 +3,81 @@ import Header from '../../Components/Header';
 import Balance from '../../Components/Balance';
 import Movements from '../../Components/Movements';
 import Actions from '../../Components/Actions';
+import ModalHome from '../../Components/ModalHome';
 
 
 
 
 const list = [
   {
-    id: 1,
-    label: 'Avon conta',
-    value: '50.00',
-    date: '13/04/2024',
-    type:0
+    "id": 1,
+    "label": "Avon conta",
+    "value": "50.00",
+    "date": "13/04/2024",
+    "type": 0
   },
   {
-    id: 2,
-    label: 'Steam conta',
-    value: '200.00',
-    date: '14/04/2024',
-    type:0
+    "id": 2,
+    "label": "Steam conta",
+    "value": "200.00",
+    "date": "14/04/2024",
+    "type": 0
   },
   {
-    id: 3,
-    label: 'Enel conta',
-    value: '150.00',
-    date: '15/04/2024',
-    type:0
+    "id": 3,
+    "label": "Enel conta",
+    "value": "150.00",
+    "date": "15/04/2024",
+    "type": 0
   },
   {
-    id: 4,
-    label: 'Mercado conta',
-    value: '44.00',
-    date: '16/04/2024',
-    type:0
+    "id": 4,
+    "label": "Mercado conta",
+    "value": "44.00",
+    "date": "16/04/2024",
+    "type": 0
   },
   {
-    id: 5,
-    label: 'Salario',
-    value: '3000.00',
-    date: '17/04/2024',
-    type:1
+    "id": 5,
+    "label": "Salario",
+    "value": "3000.00",
+    "date": "17/04/2024",
+    "type": 1
   },
   {
-    id: 6,
-    label: 'Pix Dona Jô',
-    value: '25980.10',
-    date: '17/04/2024',
-    type:1
+    "id": 6,
+    "label": "Pix Dona Jô",
+    "value": "25980.10",
+    "date": "17/04/2024",
+    "type": 1
+  },
+  {
+    "id": 7,
+    "label": "Amazon",
+    "value": "150.00",
+    "date": "18/04/2024",
+    "type": 0
+  },
+  {
+    "id": 8,
+    "label": "Netflix",
+    "value": "29.90",
+    "date": "19/04/2024",
+    "type": 0
+  },
+  {
+    "id": 9,
+    "label": "Conta de Água",
+    "value": "80.00",
+    "date": "20/04/2024",
+    "type": 0
+  },
+  {
+    "id": 10,
+    "label": "Venda de móveis",
+    "value": "500.00",
+    "date": "21/04/2024",
+    "type": 1
   }
 
 ]
@@ -70,6 +99,8 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
         renderItem={({item}) => <Movements data={item}/>}
       />
+
+    <ModalHome/>
     </View>
   );
 }

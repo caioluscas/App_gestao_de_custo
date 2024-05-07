@@ -1,57 +1,144 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import SignIn from '../SignIn';
-import React from 'react';
-
-import * as Animatable from 'react-native-animatable'
-import { FadeInLeft, FadeInUp } from 'react-native-reanimated';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, Button, Alert } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
 export default function SignUp() {
   const navigation = useNavigation();
+  
+  // Variáveis para os inputs
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [numeroTelefone, setNumeroTelefone] = useState('');
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
- return (
-   <View style={styles.container}>
+  const validateEmail = (email) => {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  };
 
-    <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
-      <Text style={styles.message}>Cadastre-se</Text>
-    </Animatable.View>
+  const validatePhoneNumber = (numero) => {
+    const re = /^\d{10,11}$/; // Verifica se o número tem 10 ou 11 dígitos
+    return re.test(numero);
+  };
 
-    <Animatable.View animation="fadeInUp" style={styles.containerForm}>
-      <Text style={styles.title}>Nome</Text>
-      <TextInput 
-      placeholder='Digite um seu nome' 
-      style={styles.input}
-      />
+  const handleSignUp = async () => {
+    if (!validateEmail(email)) {
+      setModalMessage('Por favor, insira um e-mail válido.');
+      setModalVisible(true);
+      return;
+    }
+    if (!validatePhoneNumber(numeroTelefone)) {
+      setModalMessage('Por favor, insira um número de telefone válido.');
+      setModalVisible(true);
+      return;
+    }
 
-      <Text style={styles.title}>Email</Text>
-      <TextInput 
-      placeholder='Digite seu email' 
-      style={styles.input}
-      />
+    try {
+      const response = await axios.post('http://localhost:8080/auth/register', {
+        email,
+        numeroTelefone,
+        nome,
+        password,
+        login
+      });
+      setModalMessage('Cadastro efetuado com sucesso');
+      setModalVisible(true);
+    } catch (error) {
+      setModalMessage('Erro ao cadastrar, favor tentar novamente');
+      setModalVisible(true);
+    }
+  };
 
-      <Text style={styles.title}>Telefone</Text>
-      <TextInput 
-      placeholder='Digite seu telefone' 
-      style={styles.input}
-      />
+  const closeModal = () => {
+    setModalVisible(false);
+    if (modalMessage === 'Cadastro efetuado com sucesso') {
+      navigation.navigate('SignIn');
+    }
+  };
 
-      <Text style={styles.title}>Senha</Text>
-      <TextInput 
-      placeholder='Crie sua senha' 
-      style={styles.input}
-      />
+  return (
+    <View style={styles.container}>
+      <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{modalMessage}</Text>
+              <Button
+                onPress={closeModal}
+                title="Fechar"
+                color="#2196F3"
+              />
+            </View>
+          </View>
+        </Modal>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
-        <Text style={styles.buttonText}>Acessar</Text>
-      </TouchableOpacity>
+      <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
+        <Text style={styles.message}>Cadastre-se</Text>
+      </Animatable.View>
 
-      <TouchableOpacity style={styles.buttonRegister} onPress={() => navigation.navigate('SignIn')}>
-        <Text style={styles.registerText}>Já possui uma conta? Faça o login!</Text>
-      </TouchableOpacity>
+      <Animatable.View animation="fadeInUp" style={styles.containerForm}>
+        <Text style={styles.title}>Nome</Text>
+        <TextInput 
+          placeholder='Digite seu nome' 
+          style={styles.input}
+          onChangeText={setNome}
+          value={nome}
+        />
 
-    </Animatable.View>
-    
-   </View>
+        <Text style={styles.title}>Email</Text>
+        <TextInput 
+          placeholder='Digite seu email' 
+          style={styles.input}
+          onChangeText={setEmail}
+          value={email}
+        />
+
+        <Text style={styles.title}>Telefone</Text>
+        <TextInput 
+          placeholder='Digite seu telefone' 
+          style={styles.input}
+          onChangeText={setNumeroTelefone}
+          value={numeroTelefone}
+        />
+
+        <Text style={styles.title}>Login</Text>
+        <TextInput 
+          placeholder='Digite seu login' 
+          style={styles.input}
+          onChangeText={setLogin}
+          value={login}
+        />
+
+        <Text style={styles.title}>Senha</Text>
+        <TextInput 
+          placeholder='Crie sua senha' 
+          style={styles.input}
+          onChangeText={setPassword}
+          value={password}
+          secureTextEntry={true}
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+          <Text style={styles.buttonText}>Finalizar o cadastro</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.buttonRegister} onPress={() => navigation.navigate('SignIn')}>
+          <Text style={styles.registerText}>Já possui uma conta? Faça o login!</Text>
+        </TouchableOpacity>
+      </Animatable.View>
+    </View>
   );
 }
 
@@ -80,11 +167,12 @@ const styles = StyleSheet.create({
   },
   title:{
     fontSize: 20,
-    marginTop: 28,
+    marginTop: 25,
   },
   input:{
     borderBottomWidth: 1,
     height: 40,
+    marginTop: 5,
     marginBottom: 12,
     fontSize: 16,
   },
@@ -93,11 +181,11 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 4,
     paddingVertical: 8,
-    margintop: 14,
+    marginTop: 14,
     justifyContent: 'center',
     alignItems: 'center'
   },
-   buttonText:{
+  buttonText:{
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold'
@@ -108,5 +196,30 @@ const styles = StyleSheet.create({
   },
   registerText:{
     color: '#a1a1a1'
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+    width: 0,
+    height: 2
+  },
+  shadowOpacity: 0.25,
+  shadowRadius: 4,
+  elevation: 5
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
   }
-})
+});

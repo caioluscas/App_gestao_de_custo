@@ -8,6 +8,7 @@ import {
 
 import {AntDesign} from '@expo/vector-icons'
 import { setStatusBarBackgroundColor } from 'expo-status-bar';
+import Grafico from "../../pages/Grafico";
 
 export default function Actions() {
  return (
@@ -32,7 +33,7 @@ export default function Actions() {
         <View style={styles.areaButton}>
             <AntDesign name="creditcard" size={26} color="#000"/>
         </View>
-        <Text style={styles.labelButton}>Carteira</Text>
+        <Text style={styles.labelButton}>Grafico<Grafico/></Text>
     </TouchableOpacity>
 
     <TouchableOpacity style={styles.actionButton}>

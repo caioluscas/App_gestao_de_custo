@@ -59,7 +59,11 @@ export default function SignIn() {
           onChangeText={text => setPassword(text)}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+        {/*<TouchableOpacity style={styles.button} onPress={handleSignIn}>
+          <Text style={styles.buttonText}>Acessar</Text>
+        </TouchableOpacity>*/}
+
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
           <Text style={styles.buttonText}>Acessar</Text>
         </TouchableOpacity>
 

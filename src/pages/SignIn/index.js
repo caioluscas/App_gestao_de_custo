@@ -4,6 +4,7 @@ import * as Animatable from 'react-native-animatable';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { colorKeys } from 'moti';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignIn() {
   const navigation = useNavigation();
@@ -19,6 +20,10 @@ export default function SignIn() {
         password: password
       });
       
+      await AsyncStorage.setItem('login', response.data.login);
+      console.log('Nome do usuário armazenado com sucesso:', response.data.login);
+      
+
       setToken(response.data.token)
       setShowIncorrectCredentials(false);
       navigation.navigate('Home');

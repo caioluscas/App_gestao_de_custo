@@ -4,7 +4,8 @@ import Balance from '../../Components/Balance';
 import Movements from '../../Components/Movements';
 import Actions from '../../Components/Actions';
 import ModalHome from '../../Components/ModalHome';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from 'react';
 
 
 
@@ -83,9 +84,31 @@ const list = [
 ]
 
 export default function Home() {
+
+  const [login, setLogin] = useState('');
+
+  useEffect(() => {
+    const fetchLogin = async () => {
+      try {
+        const storedLogin = await AsyncStorage.getItem('login');
+        console.log('Login do usuário recuperado:', storedLogin);
+        if (storedLogin !== null) {
+          setLogin(storedLogin);
+        } else {
+          console.log('Login do usuário não encontrado no AsyncStorage.');
+        }
+      } catch (error) {
+        console.log('Erro ao recuperar o login do usuário do AsyncStorage:', error);
+      }
+    };
+
+    fetchLogin();
+  }, []);
+  
+
   return (
     <View style={styles.container}>
-      <Header name="Caio Lucas"/>
+      <Header name={login}/>
 
       <Balance saldo="28980.10" gastos="444"/>
 

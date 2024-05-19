@@ -8,8 +8,10 @@ import {
 
 import {AntDesign} from '@expo/vector-icons'
 import { setStatusBarBackgroundColor } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Actions() {
+    const navigation = useNavigation();
  return (
    <ScrollView style={styles.container} horizontal={true} showsHorizontalScrollIndicator={false}>
 
@@ -28,11 +30,14 @@ export default function Actions() {
         <Text style={styles.labelButton}>Compras</Text>
     </TouchableOpacity>
 
-    <TouchableOpacity style={styles.actionButton}>
+    <TouchableOpacity
+        style={styles.actionButton}
+        onPress={() => navigation.navigate('Grafico')}
+    >
         <View style={styles.areaButton}>
-            <AntDesign name="creditcard" size={26} color="#000"/>
+            <AntDesign name="creditcard" size={26} color="#000" />
         </View>
-        <Text style={styles.labelButton}>Carteira</Text>
+        <Text style={styles.labelButton}>Grafico</Text>
     </TouchableOpacity>
 
     <TouchableOpacity style={styles.actionButton}>

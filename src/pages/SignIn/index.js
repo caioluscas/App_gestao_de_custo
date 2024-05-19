@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'reac
 import * as Animatable from 'react-native-animatable';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-import { colorKeys } from 'moti';
+//import { colorKeys } from 'moti';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignIn() {
@@ -15,7 +15,7 @@ export default function SignIn() {
  
   const handleSignIn = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/auth/login', {
+      const response = await axios.post('http://192.168.1.8:8080/auth/login', {
         login: login,
         password: password
       });
@@ -62,6 +62,10 @@ export default function SignIn() {
         <TouchableOpacity style={styles.button} onPress={handleSignIn}>
           <Text style={styles.buttonText}>Acessar</Text>
         </TouchableOpacity>
+
+        {/*<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
+          <Text style={styles.buttonText}>Acessar</Text>
+      </TouchableOpacity>*/}
 
         <TouchableOpacity style={styles.buttonRegister} onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.registerText}>Não possui uma conta? Cadastre-se</Text>

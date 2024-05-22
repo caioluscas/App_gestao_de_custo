@@ -4,6 +4,7 @@ import SignUp from "../pages/SignUp";
 import SignIn from "../pages/SignIn";
 import Home from "../pages/Home";
 import Grafico from "../pages/Grafico";
+import Perfil from "../pages/Perfil";
 
 
 const Stack = createNativeStackNavigator();
@@ -40,6 +41,12 @@ export default function Routes() {
         <Stack.Screen
         name="Grafico"
         component={Grafico}
+        options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+        name="Perfil"
+        component={Perfil}
         options={{headerShown: false}}
         />
     </Stack.Navigator>

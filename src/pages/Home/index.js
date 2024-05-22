@@ -4,7 +4,6 @@ import Balance from '../../Components/Balance';
 import Movements from '../../Components/Movements';
 import Actions from '../../Components/Actions';
 import ModalHome from '../../Components/ModalHome';
-import Grafico from '../Grafico';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
 

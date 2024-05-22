@@ -59,8 +59,10 @@ export default function SignIn() {
           onChangeText={text => setPassword(text)}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-          <Text style={styles.buttonText}>Acessar</Text>
+        <TouchableOpacity 
+        style={styles.button} 
+        onPress={handleSignIn}>
+          <Text style={styles.ButtonText}>Acessar</Text>
         </TouchableOpacity>
 
         {/*<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
@@ -112,17 +114,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button:{
-    backgroundColor: '#198754',
-    width: '100%',
-    borderRadius: 4,
+    position: 'absotlute',
+    backgroundColor: '#38a69d',
+    borderRadius: 50,
     paddingVertical: 8,
-    marginTop: 14,
-    justifyContent: 'center',
-    alignItems: 'center'
+    width: '60%',
+    alignSelf: 'center',
+    buttom: '15%',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-   buttonText:{
-    color: '#FFF',
+   ButtonText:{
     fontSize: 18,
+    color: '#FFF',
     fontWeight: 'bold'
   },
   buttonRegister:{

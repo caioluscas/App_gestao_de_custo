@@ -3,11 +3,12 @@ import { Chart } from "react-google-charts";
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import * as Animatable from 'react-native-animatable';
 
 export default function Grafico() {
   const navigation = useNavigation();
   const [options, setOptions] = useState({
-    title: 'Gráfico de Pizza',
+    title: '',
     titleTextStyle: {
       fontSize: 24, // Aumentando o tamanho da fonte do título
       bold: true,
@@ -29,7 +30,9 @@ export default function Grafico() {
       >
         <AntDesign name="arrowleft" size={24} color="black" />
       </TouchableOpacity>
-      <Text style={styles.title}>Gráfico</Text>
+      <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
+        <Text style={styles.title}>Grafico</Text>
+      </Animatable.View>
       <View style={styles.chartContainer}>
         <Chart
           width={'90%'} // Utilizando 90% da largura da tela

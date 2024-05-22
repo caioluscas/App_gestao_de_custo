@@ -3,10 +3,11 @@ import Header from '../../Components/Header';
 import Balance from '../../Components/Balance';
 import Movements from '../../Components/Movements';
 import Actions from '../../Components/Actions';
-import ModalHome from '../../Components/ModalHome';
+import ModalHome from '../../Components/ModalGasto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
-
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { TouchableOpacity } from 'react-native';
 
 
 const list = [
@@ -86,6 +87,7 @@ const list = [
 export default function Home() {
 
   const [login, setLogin] = useState('');
+  
 
   useEffect(() => {
     const fetchLogin = async () => {
@@ -104,7 +106,21 @@ export default function Home() {
 
     fetchLogin();
   }, []);
+
+  const [eyeIcon, setEyeIcon] = useState("eye"); // Estado para controlar o ícone do olho
+  const [showValues, setShowValues] = useState(false); // Estado para controlar a visibilidade dos valores
+
+  const toggleShowValues = () => {
+    console.log("Executando toggleShowValues...");
+    // Alternar entre mostrar e ocultar os valores e alterar o ícone do olho
+    setShowValues(!showValues);
+    setEyeIcon(showValues ? "eye-slash" : "eye");
+    console.log("showValues:", !showValues);
+    console.log("eyeIcon:", showValues ? "eye-slash" : "eye");
+  }
+
   
+
 
   return (
     <View style={styles.container}>
@@ -114,14 +130,27 @@ export default function Home() {
 
       <Actions/>
 
-      <Text style={styles.title}>Últimas movimentações</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Todas as movimentações</Text>
+        <TouchableOpacity onPress={toggleShowValues}>
+          <FontAwesome 
+            name={eyeIcon} // Use o estado do ícone do olho
+            size={24} 
+            color="black" 
+          />
+        </TouchableOpacity>
+      </View>
+
+      
       <FlatList
         style={styles.list}
         data={list}
         keyExtractor={(item)=>String(item.id)}
         showsVerticalScrollIndicator={false}
-        renderItem={({item}) => <Movements data={item}/>}
+        renderItem={({item}) => <Movements data={item} showValue={showValues}/>}
       />
+
+      
 
     <ModalHome/>
     </View>
@@ -132,6 +161,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fafafa',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 14,
+    marginBottom: 10,
   },
   title:{
     fontSize: 18,

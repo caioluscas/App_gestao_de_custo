@@ -9,6 +9,7 @@ import {
 import {AntDesign} from '@expo/vector-icons'
 import { setStatusBarBackgroundColor } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 export default function Actions() {
     const navigation = useNavigation();
@@ -17,7 +18,7 @@ export default function Actions() {
 
     <TouchableOpacity style={styles.actionButton}>
         <View style={styles.areaButton}>
-            <AntDesign name="addfolder" size={26} color="#000"/>
+            <AntDesign name="arrowup" size={26} color="#000"/>
         </View>
         <Text style={styles.labelButton}>Entradas</Text>
         
@@ -25,9 +26,9 @@ export default function Actions() {
     
     <TouchableOpacity style={styles.actionButton}>
         <View style={styles.areaButton}>
-            <AntDesign name="tagso" size={26} color="#000"/>
+            <AntDesign name="arrowdown" size={26} color="#000"/>
         </View>
-        <Text style={styles.labelButton}>Compras</Text>
+        <Text style={styles.labelButton}>Saídas</Text>
     </TouchableOpacity>
 
     <TouchableOpacity
@@ -35,7 +36,7 @@ export default function Actions() {
         onPress={() => navigation.navigate('Grafico')}
     >
         <View style={styles.areaButton}>
-            <AntDesign name="creditcard" size={26} color="#000" />
+            <FontAwesome6 name="pizza-slice" size={24} color="black" />
         </View>
         <Text style={styles.labelButton}>Grafico</Text>
     </TouchableOpacity>

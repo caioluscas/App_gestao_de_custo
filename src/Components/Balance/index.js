@@ -23,7 +23,7 @@ export default function Balance({saldo, gastos}) {
    >
 
     <View style={styles.item}>
-        <Text style={styles.itemTitle}>Saldo</Text>
+        <Text style={styles.itemTitle}>Saldo Total</Text>
         <View style={styles.content}>
             <Text style={styles.currencySymbol}>R$</Text>
             <Text style={styles.balance}>{saldo}</Text>

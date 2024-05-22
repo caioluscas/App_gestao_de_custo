@@ -62,7 +62,7 @@ class UploadImage extends React.Component {
                 >
                     <AntDesign name="arrowleft" size={24} color="black" />
                 </TouchableOpacity>
-                <View style={styles.editorWrapper}>
+                <View style={[styles.editorWrapper, !this.state.image && styles.placeholderCircle]}>
                     <ReactAvatarEditor
                         ref={this.setEditorRef}
                         scale={parseFloat(this.state.scale)}
@@ -122,6 +122,10 @@ const styles = StyleSheet.create({
     },
     editorWrapper: {
         marginBottom: 20,
+        backgroundColor: '#ecf0f1', // Cor de fundo padrão
+    },
+    placeholderCircle: {
+        backgroundColor: '#4d4d4d', // Cor de fundo para quando não houver imagem
     },
     uploadLabel: {
         flexDirection: 'column',
@@ -144,6 +148,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         width: '100%',
         textAlign: 'center',
+        alignSelf: 'center', // Centraliza horizontalmente
     },
     zoomControlText: {
         marginBottom: 10,

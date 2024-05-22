@@ -10,6 +10,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { TouchableOpacity } from 'react-native';
 
 
+
 const list = [
   {
     "id": 1,
@@ -87,7 +88,6 @@ const list = [
 export default function Home() {
 
   const [login, setLogin] = useState('');
-  
 
   useEffect(() => {
     const fetchLogin = async () => {
@@ -105,54 +105,33 @@ export default function Home() {
     };
 
     fetchLogin();
-  }, []);
-
-  const [eyeIcon, setEyeIcon] = useState("eye"); // Estado para controlar o ícone do olho
-  const [showValues, setShowValues] = useState(false); // Estado para controlar a visibilidade dos valores
-
-  const toggleShowValues = () => {
-    console.log("Executando toggleShowValues...");
-    // Alternar entre mostrar e ocultar os valores e alterar o ícone do olho
-    setShowValues(!showValues);
-    setEyeIcon(showValues ? "eye-slash" : "eye");
-    console.log("showValues:", !showValues);
-    console.log("eyeIcon:", showValues ? "eye-slash" : "eye");
-  }
-
-  
+  });
 
 
   return (
     <View style={styles.container}>
-      <Header name={login}/>
+      <Header name={login} />
 
-      <Balance saldo="28980.10" gastos="444"/>
+      <Balance saldo="28980.10" gastos="444" />
 
-      <Actions/>
+      <Actions />
 
       <View style={styles.header}>
         <Text style={styles.title}>Todas as movimentações</Text>
-        <TouchableOpacity onPress={toggleShowValues}>
-          <FontAwesome 
-            name={eyeIcon} // Use o estado do ícone do olho
-            size={24} 
-            color="black" 
-          />
-        </TouchableOpacity>
       </View>
 
-      
+
       <FlatList
         style={styles.list}
         data={list}
-        keyExtractor={(item)=>String(item.id)}
+        keyExtractor={(item) => String(item.id)}
         showsVerticalScrollIndicator={false}
-        renderItem={({item}) => <Movements data={item} showValue={showValues}/>}
+        renderItem={({ item }) => <Movements data={item} />}
       />
 
-      
 
-    <ModalHome/>
+
+      <ModalHome />
     </View>
   );
 }
@@ -169,13 +148,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 14,
     marginBottom: 10,
   },
-  title:{
+  title: {
     fontSize: 18,
     fontWeight: 'bold',
     margin: 10,
   },
-  list:{
+  list: {
     marginStart: 14,
-    marginEnd:14,
+    marginEnd: 14,
   }
 });

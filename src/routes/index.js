@@ -5,6 +5,7 @@ import SignIn from "../pages/SignIn";
 import Home from "../pages/Home";
 import Grafico from "../pages/Grafico";
 import Perfil from "../pages/Perfil";
+import ModalEntrada from "../Components/ModalEntrada";
 
 
 const Stack = createNativeStackNavigator();
@@ -49,6 +50,8 @@ export default function Routes() {
         component={Perfil}
         options={{headerShown: false}}
         />
+
+        
     </Stack.Navigator>
   )
 }

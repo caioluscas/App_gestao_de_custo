@@ -7,7 +7,7 @@ import axios from 'axios';
 
 Modal.setAppElement('#root');
 
-export default function ModalHome() {
+export default function ModalGasto() {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [Local, setLocal] = useState('');
   const [descricao, setDescricao] = useState('');

@@ -8,6 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { TouchableOpacity } from 'react-native';
+import ModalGasto from '../../Components/ModalGasto';
+import ModalEntrada from '../../Components/ModalEntrada';
 
 
 
@@ -129,9 +131,10 @@ export default function Home() {
         renderItem={({ item }) => <Movements data={item} />}
       />
 
+      <ModalEntrada/>
 
-
-      <ModalHome />
+      <ModalGasto />
+      
     </View>
   );
 }

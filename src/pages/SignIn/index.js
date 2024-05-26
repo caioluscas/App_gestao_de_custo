@@ -10,7 +10,6 @@ export default function SignIn() {
   const navigation = useNavigation();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [token, setToken] = useState('');
   const [showIncorrectCredentials, setShowIncorrectCredentials] = useState(false); // Estado para controlar a visibilidade da mensagem
  
   const handleSignIn = async () => {
@@ -19,7 +18,15 @@ export default function SignIn() {
         login: login,
         password: password
       });
-      
+
+      // Armazena dados em variáveis globais
+      global.userId = response.data.id;
+      global.userLogin = response.data.login;
+      global.userToken = response.data.token;
+
+      // Log do ID do usuário
+      console.log('ID do usuário:', global.userId);
+
       await AsyncStorage.setItem('login', response.data.login);
       console.log('Nome do usuário armazenado com sucesso:', response.data.login);
       

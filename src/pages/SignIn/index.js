@@ -3,15 +3,14 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'reac
 import * as Animatable from 'react-native-animatable';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-//import { colorKeys } from 'moti';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignIn() {
   const navigation = useNavigation();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [showIncorrectCredentials, setShowIncorrectCredentials] = useState(false); // Estado para controlar a visibilidade da mensagem
- 
+  const [showIncorrectCredentials, setShowIncorrectCredentials] = useState(false);
+
   const handleSignIn = async () => {
     try {
       const response = await axios.post('http://localhost:8080/auth/login', {
@@ -26,19 +25,17 @@ export default function SignIn() {
 
       // Log do ID do usuário
       console.log('ID do usuário:', global.userId);
+      console.log('Token do usuário:', global.userToken);
 
       await AsyncStorage.setItem('login', response.data.login);
       console.log('Nome do usuário armazenado com sucesso:', response.data.login);
-      
 
-      setToken(response.data.token)
       setShowIncorrectCredentials(false);
       navigation.navigate('Home');
-
     } catch (error) {
+      console.error('Erro ao tentar fazer login:', error);
       setShowIncorrectCredentials(true);
       Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login.');
-      navigation.navigate('SignIn');
     }
   };
 
@@ -67,84 +64,80 @@ export default function SignIn() {
         />
 
         <TouchableOpacity 
-        style={styles.button} 
-        onPress={handleSignIn}>
+          style={styles.button} 
+          onPress={handleSignIn}
+        >
           <Text style={styles.ButtonText}>Acessar</Text>
         </TouchableOpacity>
-
-        {/*<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
-          <Text style={styles.buttonText}>Acessar</Text>
-      </TouchableOpacity>*/}
 
         <TouchableOpacity style={styles.buttonRegister} onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.registerText}>Não possui uma conta? Cadastre-se</Text>
         </TouchableOpacity>
 
         {showIncorrectCredentials && <Text style={styles.alertText}>Credenciais incorretas</Text>}
-
       </Animatable.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     flex: 1,
-    backgroundColor:'#9EBE96',
+    backgroundColor: '#9EBE96',
   },
-  containerHeader:{
+  containerHeader: {
     marginTop: '14%',
     marginBottom: '8%',
     paddingStart: '5%',
   },
-  message:{
+  message: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFF'
+    color: '#FFF',
   },
-  containerForm:{
+  containerForm: {
     backgroundColor: '#FFF',
     flex: 1,
     borderTopRightRadius: 25,
     borderTopLeftRadius: 25,
     paddingStart: '5%',
-    paddingEnd: '5%' 
+    paddingEnd: '5%',
   },
-  title:{
+  title: {
     fontSize: 20,
     marginTop: 28,
   },
-  input:{
+  input: {
     borderBottomWidth: 1,
     height: 40,
     marginBottom: 12,
     fontSize: 16,
   },
-  button:{
-    position: 'absotlute',
+  button: {
+    position: 'absolute',
     backgroundColor: '#38a69d',
     borderRadius: 50,
     paddingVertical: 8,
     width: '60%',
     alignSelf: 'center',
-    buttom: '15%',
+    bottom: '15%',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
-   ButtonText:{
+  ButtonText: {
     fontSize: 18,
     color: '#FFF',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
-  buttonRegister:{
+  buttonRegister: {
     marginTop: 14,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
-  registerText:{
-    color: '#a1a1a1'
+  registerText: {
+    color: '#a1a1a1',
   },
-  alertText:{
+  alertText: {
     color: '#FF0000',
-    alignSelf: 'center'
-  }
-})
+    alignSelf: 'center',
+  },
+});

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import Modal from 'react-modal';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import * as Animatable from 'react-native-animatable';
@@ -16,30 +16,53 @@ export default function ModalGasto() {
   const [valorGasto, setValorGasto] = useState('');
   const [eparcela, setEParcela] = useState(false);
 
-  const handleSalvarGasto = () => {
+  const handleSalvarGasto = async () => {
     if (!Local || !descricao || (eparcela && (!parcela || !valorParcela)) || (!eparcela && !valorGasto)) {
       alert('Por favor, preencha todos os campos.');
       return;
     }
   
-    const dados = {
-      valor: eparcela ? '' : valorGasto, // Se for parcelado, o valor do gasto é vazio
-      valorParcela: valorParcela,
-      parcela: parcela,
-      descricao: descricao,
-      Local: Local,
+    const carteiraId = {
+      id: global.userId
     };
-  
-    axios.post('http://localhost:8080/user/gasto', dados)
-      .then(response => {
-        console.log('Resposta do servidor:', response);
-      })
-      .catch(error => {
-        console.error('Erro ao enviar requisição:', error);
-      });
 
-      fecharModal();
-  };
+    const dados = {
+        idCarteira: 1,
+        valor: eparcela ? '' : valorGasto, // Se for parcelado, o valor do gasto é vazio
+        eparcela: eparcela,
+        valorParcela: valorParcela, 
+        descricao: descricao,
+        Local: Local,
+        parcela: parcela
+      };
+    
+      try {
+        // Fazendo a requisição GET para obter o idCarteira
+        const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+          headers: {
+            'Authorization': 'Bearer ' + global.userToken
+          }
+        });
+  
+        console.log('Resposta do servidor (carteira):', carteiraResponse.data);
+  
+        // Supondo que você precise do idCarteira da resposta
+        const idCarteira = carteiraResponse.data.idCarteira;
+        dados.idCarteira = idCarteira;
+    
+        // Fazendo a requisição POST para salvar o gasto
+        const gastoResponse = await axios.post('http://localhost:8080/user/gasto', dados, {
+          headers: {
+            'Authorization': 'Bearer ' + global.userToken
+          }
+        });
+  
+        console.log('Resposta do servidor (gasto):', gastoResponse.data);
+        fecharModal();
+      } catch (error) {
+        console.error('Erro ao enviar requisição:', error);
+      }
+    };
 
   function abrirModal() {
     setIsOpen(true);
@@ -55,17 +78,6 @@ export default function ModalGasto() {
       setValorGasto(valorCalculado.toString());
     }
   }, [parcela, valorParcela, eparcela]);
-
-  // function handleSalvarGasto() {
-  //   // Aqui você pode adicionar a lógica para salvar os dados do gasto
-  //   console.log('Local:', local);
-  //   console.log('Descrição:', descricao);
-  //   console.log('Parcela:', parcela);
-  //   console.log('Valor da Parcela:', valorParcela);
-  //   console.log('Valor do Gasto:', valorGasto);
-  //   // Depois de salvar, você pode fechar o modal
-  //   fecharModal();
-  // }
 
   return (
     <View style={styles.container}>
@@ -137,8 +149,6 @@ export default function ModalGasto() {
             </>
           )}
 
-
-
           <View style={styles.checkboxContainer}>
             <Text style={styles.checkboxLabel}>Compra parcelada?</Text>
             <TouchableOpacity
@@ -175,12 +185,11 @@ export default function ModalGasto() {
 }
 
 const styles = StyleSheet.create({
-   
   container: {
     flex: 100,
     justifyContent: 'center', // Centraliza os elementos verticalmente
     alignItems: 'center', // Centraliza os elementos horizontalmente
-    },
+  },
   addButton: {
     position: 'fixed',
     backgroundColor: '#198754',
@@ -192,9 +201,8 @@ const styles = StyleSheet.create({
   },
   addButtonIcon: {
     color: '#FFF',
-    flex:20,
+    flex: 20,
   },
-
   containerHeader: {
     marginTop: '14%',
     marginBottom: '8%',

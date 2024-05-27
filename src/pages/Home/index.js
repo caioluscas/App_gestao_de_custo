@@ -14,6 +14,38 @@ export default function Home() {
   const [movements, setMovements] = useState([]);
   const [balance, setBalance] = useState({ saldo: '0', gastos: '0' });
 
+  const fetchMovements = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+        headers: {
+          'Authorization': 'Bearer ' + global.userToken
+        }
+      });
+
+      const { valorDisponivel, listaDeMovimentacoes } = response.data;
+
+      // Transformar os dados de movimentações
+      const formattedMovements = listaDeMovimentacoes.map(mov => ({
+        id: mov.id,
+        label: mov.descricao,
+        value: Math.abs(mov.valor).toFixed(2),
+        date: mov.dataEntrada,
+        type: mov.valor >= 0 ? 1 : 0  // Assumindo que valores positivos são entradas e negativos são gastos
+      }));
+
+      setMovements(formattedMovements);
+      setBalance({
+        saldo: valorDisponivel.toFixed(2),
+        gastos: listaDeMovimentacoes
+          .filter(item => item.valor < 0)
+          .reduce((acc, item) => acc + Math.abs(item.valor), 0)
+          .toFixed(2)
+      });
+    } catch (error) {
+      console.log('Erro ao obter os movimentos:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchLogin = async () => {
       try {
@@ -26,38 +58,6 @@ export default function Home() {
         }
       } catch (error) {
         console.log('Erro ao recuperar o login do usuário do AsyncStorage:', error);
-      }
-    };
-
-    const fetchMovements = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
-          headers: {
-            'Authorization': 'Bearer ' + global.userToken
-          }
-        });
-
-        const { valorDisponivel, listaDeMovimentacoes } = response.data;
-
-        // Transformar os dados de movimentações
-        const formattedMovements = listaDeMovimentacoes.map(mov => ({
-          id: mov.id,
-          label: mov.descricao,
-          value: mov.valor,
-          date: mov.dataEntrada,
-          type: mov.valor >= 0 ? 1 : 0  // Assumindo que valores positivos são entradas e negativos são gastos
-        }));
-
-        setMovements(formattedMovements);
-        setBalance({
-          saldo: valorDisponivel.toFixed(2),
-          gastos: listaDeMovimentacoes
-            .filter(item => item.valor < 0)
-            .reduce((acc, item) => acc + Math.abs(item.valor), 0)
-            .toFixed(2)
-        });
-      } catch (error) {
-        console.log('Erro ao obter os movimentos:', error);
       }
     };
 
@@ -87,7 +87,7 @@ export default function Home() {
       />
 
       <ModalEntrada />
-      <ModalGasto />
+      <ModalGasto onSuccess={fetchMovements} />
     </View>
   );
 }
@@ -115,5 +115,5 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 100, // Adiciona um padding para evitar sobreposição com os botões
-  }
+  },
 });

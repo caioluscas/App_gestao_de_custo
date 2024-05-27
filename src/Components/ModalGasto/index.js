@@ -3,10 +3,10 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal } from 'reac
 import { PlusCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
-export default function ModalGasto() {
+export default function ModalGasto({ onSuccess }) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [successPopupIsOpen, setSuccessPopupIsOpen] = useState(false);
-  const [Local, setLocal] = useState('');
+  const [local, setLocal] = useState(''); // Certifique-se de que o nome do estado está em minúsculas
   const [descricao, setDescricao] = useState('');
   const [parcelas, setParcelas] = useState('');
   const [valorParcela, setValorParcela] = useState('');
@@ -23,7 +23,7 @@ export default function ModalGasto() {
   };
 
   const handleSalvarGasto = async () => {
-    if (!Local || !descricao || (eparcela && (!parcelas || !valorParcela)) || (!eparcela && !valorGasto)) {
+    if (!local || !descricao || (eparcela && (!parcelas || !valorParcela)) || (!eparcela && !valorGasto)) {
       alert('Por favor, preencha todos os campos.');
       return;
     }
@@ -40,9 +40,11 @@ export default function ModalGasto() {
       parcelas: eparcela ? parseInt(parcelas) : 0,
       valorParcela: eparcela ? parseFloat(valorParcela) : 0,
       descricao: descricao,
-      local: Local,
+      Local: local, // Certifique-se de que o valor de "local" está sendo incluído corretamente
     };
 
+    console.log('Dados a serem enviados:', dados);
+    
     try {
       const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
         headers: {
@@ -63,6 +65,9 @@ export default function ModalGasto() {
 
       console.log('Resposta do servidor (gasto):', gastoResponse.data);
       setSuccessPopupIsOpen(true);
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       console.error('Erro ao enviar requisição:', error);
     }
@@ -108,7 +113,7 @@ export default function ModalGasto() {
             <TextInput
               placeholder='Digite o local'
               style={styles.input}
-              value={Local}
+              value={local} // Certifique-se de que o valor de "local" está sendo atribuído corretamente
               onChangeText={text => setLocal(text)}
             />
 

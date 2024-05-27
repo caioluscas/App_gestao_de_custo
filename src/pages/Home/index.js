@@ -3,93 +3,16 @@ import Header from '../../Components/Header';
 import Balance from '../../Components/Balance';
 import Movements from '../../Components/Movements';
 import Actions from '../../Components/Actions';
-import ModalHome from '../../Components/ModalGasto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { TouchableOpacity } from 'react-native';
+import axios from 'axios';
 import ModalGasto from '../../Components/ModalGasto';
 import ModalEntrada from '../../Components/ModalEntrada';
 
-
-
-const list = [
-  {
-    "id": 1,
-    "label": "Avon conta",
-    "value": "50.00",
-    "date": "13/04/2024",
-    "type": 0
-  },
-  {
-    "id": 2,
-    "label": "Steam conta",
-    "value": "200.00",
-    "date": "14/04/2024",
-    "type": 0
-  },
-  {
-    "id": 3,
-    "label": "Enel conta",
-    "value": "150.00",
-    "date": "15/04/2024",
-    "type": 0
-  },
-  {
-    "id": 4,
-    "label": "Mercado conta",
-    "value": "44.00",
-    "date": "16/04/2024",
-    "type": 0
-  },
-  {
-    "id": 5,
-    "label": "Salario",
-    "value": "3000.00",
-    "date": "17/04/2024",
-    "type": 1
-  },
-  {
-    "id": 6,
-    "label": "Pix Dona Jô",
-    "value": "25980.10",
-    "date": "17/04/2024",
-    "type": 1
-  },
-  {
-    "id": 7,
-    "label": "Amazon",
-    "value": "150.00",
-    "date": "18/04/2024",
-    "type": 0
-  },
-  {
-    "id": 8,
-    "label": "Netflix",
-    "value": "29.90",
-    "date": "19/04/2024",
-    "type": 0
-  },
-  {
-    "id": 9,
-    "label": "Conta de Água",
-    "value": "80.00",
-    "date": "20/04/2024",
-    "type": 0
-  },
-  {
-    "id": 10,
-    "label": "Venda de móveis",
-    "value": "500.00",
-    "date": "21/04/2024",
-    "type": 1
-  }
-
-]
-
 export default function Home() {
-
   const [login, setLogin] = useState('');
+  const [movements, setMovements] = useState([]);
+  const [balance, setBalance] = useState({ saldo: '0', gastos: '0' });
 
   useEffect(() => {
     const fetchLogin = async () => {
@@ -106,15 +29,47 @@ export default function Home() {
       }
     };
 
-    fetchLogin();
-  });
+    const fetchMovements = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+          headers: {
+            'Authorization': 'Bearer ' + global.userToken
+          }
+        });
 
+        const { valorDisponivel, listaDeMovimentacoes } = response.data;
+
+        // Transformar os dados de movimentações
+        const formattedMovements = listaDeMovimentacoes.map(mov => ({
+          id: mov.id,
+          label: mov.descricao,
+          value: mov.valor,
+          date: mov.dataEntrada,
+          type: mov.valor >= 0 ? 1 : 0  // Assumindo que valores positivos são entradas e negativos são gastos
+        }));
+
+        setMovements(formattedMovements);
+        setBalance({
+          saldo: valorDisponivel.toFixed(2),
+          gastos: listaDeMovimentacoes
+            .filter(item => item.valor < 0)
+            .reduce((acc, item) => acc + Math.abs(item.valor), 0)
+            .toFixed(2)
+        });
+      } catch (error) {
+        console.log('Erro ao obter os movimentos:', error);
+      }
+    };
+
+    fetchLogin();
+    fetchMovements();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Header name={login} />
 
-      <Balance saldo="28980.10" gastos="444" />
+      <Balance saldo={balance.saldo} gastos={balance.gastos} />
 
       <Actions />
 
@@ -122,19 +77,17 @@ export default function Home() {
         <Text style={styles.title}>Todas as movimentações</Text>
       </View>
 
-
       <FlatList
         style={styles.list}
-        data={list}
+        contentContainerStyle={styles.listContent}
+        data={movements}
         keyExtractor={(item) => String(item.id)}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => <Movements data={item} />}
       />
 
-      <ModalEntrada/>
-
+      <ModalEntrada />
       <ModalGasto />
-      
     </View>
   );
 }
@@ -159,5 +112,8 @@ const styles = StyleSheet.create({
   list: {
     marginStart: 14,
     marginEnd: 14,
+  },
+  listContent: {
+    paddingBottom: 100, // Adiciona um padding para evitar sobreposição com os botões
   }
 });

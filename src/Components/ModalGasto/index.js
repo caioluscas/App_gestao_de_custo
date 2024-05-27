@@ -1,83 +1,93 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import Modal from 'react-modal';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal } from 'react-native';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import * as Animatable from 'react-native-animatable';
 import axios from 'axios';
-
-Modal.setAppElement('#root');
 
 export default function ModalGasto() {
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [successPopupIsOpen, setSuccessPopupIsOpen] = useState(false);
   const [Local, setLocal] = useState('');
   const [descricao, setDescricao] = useState('');
-  const [parcela, setParcela] = useState('');
+  const [parcelas, setParcelas] = useState('');
   const [valorParcela, setValorParcela] = useState('');
   const [valorGasto, setValorGasto] = useState('');
   const [eparcela, setEParcela] = useState(false);
 
+  const resetFields = () => {
+    setLocal('');
+    setDescricao('');
+    setParcelas('');
+    setValorParcela('');
+    setValorGasto('');
+    setEParcela(false);
+  };
+
   const handleSalvarGasto = async () => {
-    if (!Local || !descricao || (eparcela && (!parcela || !valorParcela)) || (!eparcela && !valorGasto)) {
+    if (!Local || !descricao || (eparcela && (!parcelas || !valorParcela)) || (!eparcela && !valorGasto)) {
       alert('Por favor, preencha todos os campos.');
       return;
     }
-  
-    const carteiraId = {
-      id: global.userId
-    };
+
+    let valorCalculado = valorGasto;
+    if (eparcela) {
+      valorCalculado = (parseFloat(parcelas) * parseFloat(valorParcela)).toString();
+    }
 
     const dados = {
-        idCarteira: 1,
-        valor: eparcela ? '' : valorGasto, // Se for parcelado, o valor do gasto é vazio
-        eparcela: eparcela,
-        valorParcela: valorParcela, 
-        descricao: descricao,
-        Local: Local,
-        parcela: parcela
-      };
-    
-      try {
-        // Fazendo a requisição GET para obter o idCarteira
-        const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
-          headers: {
-            'Authorization': 'Bearer ' + global.userToken
-          }
-        });
-  
-        console.log('Resposta do servidor (carteira):', carteiraResponse.data);
-  
-        // Supondo que você precise do idCarteira da resposta
-        const idCarteira = carteiraResponse.data.idCarteira;
-        dados.idCarteira = idCarteira;
-    
-        // Fazendo a requisição POST para salvar o gasto
-        const gastoResponse = await axios.post('http://localhost:8080/user/gasto', dados, {
-          headers: {
-            'Authorization': 'Bearer ' + global.userToken
-          }
-        });
-  
-        console.log('Resposta do servidor (gasto):', gastoResponse.data);
-        fecharModal();
-      } catch (error) {
-        console.error('Erro ao enviar requisição:', error);
-      }
+      idCarteira: 1,
+      valor: valorCalculado,
+      eparcela: eparcela,
+      parcelas: eparcela ? parseInt(parcelas) : 0,
+      valorParcela: eparcela ? parseFloat(valorParcela) : 0,
+      descricao: descricao,
+      local: Local,
     };
 
-  function abrirModal() {
-    setIsOpen(true);
-  }
+    try {
+      const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+        headers: {
+          'Authorization': 'Bearer ' + global.userToken
+        }
+      });
 
-  function fecharModal() {
+      console.log('Resposta do servidor (carteira):', carteiraResponse.data);
+
+      const idCarteira = carteiraResponse.data.idCarteira;
+      dados.idCarteira = idCarteira;
+
+      const gastoResponse = await axios.post('http://localhost:8080/user/gasto', dados, {
+        headers: {
+          'Authorization': 'Bearer ' + global.userToken
+        }
+      });
+
+      console.log('Resposta do servidor (gasto):', gastoResponse.data);
+      setSuccessPopupIsOpen(true);
+    } catch (error) {
+      console.error('Erro ao enviar requisição:', error);
+    }
+  };
+
+  const abrirModal = () => {
+    setIsOpen(true);
+  };
+
+  const fecharModal = () => {
     setIsOpen(false);
-  }
+    resetFields();
+  };
+
+  const fecharPopupSucesso = () => {
+    setSuccessPopupIsOpen(false);
+    fecharModal();
+  };
 
   useEffect(() => {
-    if (eparcela && parcela && valorParcela) {
-      const valorCalculado = parseFloat(parcela) * parseFloat(valorParcela);
+    if (eparcela && parcelas && valorParcela) {
+      const valorCalculado = parseFloat(parcelas) * parseFloat(valorParcela);
       setValorGasto(valorCalculado.toString());
     }
-  }, [parcela, valorParcela, eparcela]);
+  }, [parcelas, valorParcela, eparcela]);
 
   return (
     <View style={styles.container}>
@@ -85,100 +95,98 @@ export default function ModalGasto() {
         <PlusCircleOutlined style={styles.addButtonIcon} />
       </TouchableOpacity>
       <Modal
-        isOpen={modalIsOpen}
+        transparent={true}
+        animationType="slide"
+        visible={modalIsOpen}
         onRequestClose={fecharModal}
-        contentLabel="Modal de exemplo"
-        style={{
-          overlay: {
-            backgroundColor: 'rgba(0, 0 ,0, 0.8)',
-            transition: 'opacity 200ms ease-in-out', // Adiciona transição de opacidade para a sobreposição
-          },
-          content: {
-            width: '80%', // Largura da caixa do modal
-            maxWidth: 400, // Largura máxima da caixa do modal
-            margin: 'auto', // Centraliza a caixa do modal horizontalmente
-            border: '1px solid green',
-            background: '#839cff',
-            borderRadius: '20px',
-            padding: '5%',
-            transition: 'transform 0.3s ease-in-out', // Adiciona transição de transformação para o conteúdo do modal
-            transform: modalIsOpen ? 'translateY(0)' : 'translateY(100%)', // Move o modal para cima quando aberto e para baixo quando fechado
-          }
-        }}
       >
-        <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
-          <Text style={styles.message}>Informe os dados do gasto</Text>
-        </Animatable.View>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.message}>Informe os dados do gasto</Text>
 
-        <Animatable.View animation="fadeInUp" style={styles.containerForm}>
-          <Text style={styles.title}>Local:</Text>
-          <TextInput
-            placeholder='Digite o local'
-            style={styles.input}
-            value={Local}
-            onChangeText={text => setLocal(text)}
-          />
+            <Text style={styles.title}>Local:</Text>
+            <TextInput
+              placeholder='Digite o local'
+              style={styles.input}
+              value={Local}
+              onChangeText={text => setLocal(text)}
+            />
 
-          <Text style={styles.title}>Descrição:</Text>
-          <TextInput
-            placeholder='Digite a descrição'
-            style={styles.input}
-            value={descricao}
-            onChangeText={text => setDescricao(text)}
-          />
+            <Text style={styles.title}>Descrição:</Text>
+            <TextInput
+              placeholder='Digite a descrição'
+              style={styles.input}
+              value={descricao}
+              onChangeText={text => setDescricao(text)}
+            />
 
-          {eparcela && ( // Renderiza o campo de parcela apenas se a compra for parcelada
-            <>
-              <Text style={styles.title}>Parcela:</Text>
-              <TextInput
-                placeholder='Digite a parcela'
-                style={styles.input}
-                value={parcela}
-                onChangeText={text => setParcela(text)}
-                keyboardType='decimal-pad'
-              />
+            {eparcela && (
+              <>
+                <Text style={styles.title}>Parcelas:</Text>
+                <TextInput
+                  placeholder='Digite o número de parcelas'
+                  style={styles.input}
+                  value={parcelas}
+                  onChangeText={text => setParcelas(text)}
+                  keyboardType='decimal-pad'
+                />
 
-              <Text style={styles.title}>Valor da Parcela:</Text>
-              <TextInput
-                placeholder='Digite o valor da parcela'
-                style={styles.input}
-                value={valorParcela}
-                onChangeText={text => setValorParcela(text)}
-                keyboardType='decimal-pad'
-              />
-            </>
-          )}
+                <Text style={styles.title}>Valor da Parcela:</Text>
+                <TextInput
+                  placeholder='Digite o valor da parcela'
+                  style={styles.input}
+                  value={valorParcela}
+                  onChangeText={text => setValorParcela(text)}
+                  keyboardType='decimal-pad'
+                />
+              </>
+            )}
 
-          <View style={styles.checkboxContainer}>
-            <Text style={styles.checkboxLabel}>Compra parcelada?</Text>
-            <TouchableOpacity
-              onPress={() => setEParcela(!eparcela)}
-              style={[styles.checkbox, eparcela && styles.checkboxSelected]}
-            >
-              {eparcela && <Text style={styles.checkboxText}>✔</Text>} {/* Ícone de marca de seleção quando a compra for parcelada */}
-              {!eparcela && <Text style={styles.checkboxText}>❌</Text>} {/* Ícone de marca de seleção vazio quando a compra não for parcelada */}
+            <View style={styles.checkboxContainer}>
+              <Text style={styles.checkboxLabel}>Compra parcelada?</Text>
+              <TouchableOpacity
+                onPress={() => setEParcela(!eparcela)}
+                style={[styles.checkbox, eparcela && styles.checkboxSelected]}
+              >
+                {eparcela ? <Text style={styles.checkboxText}>✔</Text> : <Text style={styles.checkboxText}>❌</Text>}
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.title}>Valor do Gasto:</Text>
+            <TextInput
+              placeholder='Digite o valor do gasto'
+              style={[styles.input, eparcela && styles.inputDisabled]}
+              value={valorGasto}
+              onChangeText={text => setValorGasto(text)}
+              editable={!eparcela}
+              keyboardType='decimal-pad'
+            />
+
+            <TouchableOpacity style={styles.button} onPress={handleSalvarGasto}>
+              <Text style={styles.buttonText}>Salvar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.buttonCancelar} onPress={fecharModal}>
+              <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
+        </View>
+      </Modal>
 
-          <Text style={styles.title}>Valor do Gasto:</Text>
-          <TextInput
-            placeholder='Digite o valor do gasto'
-            style={[styles.input, eparcela && styles.inputDisabled]}
-            value={valorGasto}
-            onChangeText={text => setValorGasto(text)}
-            editable={!eparcela}
-            keyboardType='decimal-pad'
-          />
-
-          <TouchableOpacity style={styles.button} onPress={handleSalvarGasto}>
-            <Text style={styles.buttonText}>Salvar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.buttonCancelar} onPress={fecharModal}>
-            <Text style={styles.buttonText}>Cancelar</Text>
-          </TouchableOpacity>
-
-        </Animatable.View>
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={successPopupIsOpen}
+        onRequestClose={fecharPopupSucesso}
+      >
+        <View style={styles.popupOverlay}>
+          <View style={styles.popupContent}>
+            <Text style={styles.successMessage}>Cadastrado com sucesso!</Text>
+            <TouchableOpacity style={styles.successButton} onPress={fecharPopupSucesso}>
+              <Text style={styles.buttonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     </View>
   );
@@ -186,93 +194,127 @@ export default function ModalGasto() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 100,
-    justifyContent: 'center', // Centraliza os elementos verticalmente
-    alignItems: 'center', // Centraliza os elementos horizontalmente
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   addButton: {
-    position: 'fixed',
     backgroundColor: '#198754',
     borderRadius: 50,
     padding: 20,
-    right: 20, // Ajusta a posição do botão para a esquerda
-    top: 1000, // Ajusta a posição do botão para cima
-    zIndex: 10,
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
   },
   addButtonIcon: {
     color: '#FFF',
-    flex: 20,
   },
-  containerHeader: {
-    marginTop: '14%',
-    marginBottom: '8%',
-    paddingStart: '5%',
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    maxWidth: 400,
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
   },
   message: {
-    fontSize: 28,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFF'
-  },
-  containerForm: {
-    backgroundColor: '#FFF',
-    flex: 1,
-    borderRadius: 25,
-    paddingStart: '5%',
-    paddingEnd: '5%' 
+    marginBottom: 20,
   },
   title: {
-    fontSize: 20,
-    marginTop: 28,
+    fontSize: 16,
+    alignSelf: 'flex-start',
+    marginTop: 10,
   },
   input: {
+    width: '100%',
     borderBottomWidth: 1,
     height: 40,
     marginBottom: 12,
     fontSize: 16,
+    padding: 10,
   },
   button: {
     backgroundColor: '#198754',
     borderRadius: 4,
-    paddingVertical: 30,
-    marginTop: 30,
-    justifyContent: 'center',
-    alignItems: 'center'
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 20,
+    alignItems: 'center',
+    width: '100%',
   },
   buttonText: {
     color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold'
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   buttonCancelar: {
     backgroundColor: '#dc3545',
-    width: '100%',
     borderRadius: 4,
-    paddingVertical: 8,
-    marginTop: 30,
-    marginBottom: 20,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  checkboxSelected: {
-    backgroundColor: '#198754', // Cor de fundo quando selecionado
-    borderWidth: 2, // Largura da borda quando selecionado
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 10,
+    alignItems: 'center',
+    width: '100%',
   },
   checkboxContainer: {
-    flexDirection: 'row', // Alinha os itens horizontalmente
-    alignItems: 'center', // Alinha os itens verticalmente
-    marginBottom: 12, // Espaçamento inferior
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   checkboxLabel: {
-    fontSize: 16, // Tamanho do texto
-    marginRight: 10, // Espaçamento à direita do texto
+    fontSize: 16,
+    marginRight: 10,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxSelected: {
+    backgroundColor: '#198754',
   },
   checkboxText: {
-    fontSize: 20, // Tamanho do texto
-    color: '#FFF', // Cor do texto
-    marginLeft: 5, // Espaçamento à esquerda do texto
+    color: '#FFF',
+    fontSize: 14,
   },
   inputDisabled: {
-    backgroundColor: '#f5f5f5', // Cor de fundo quando desabilitado
-    color: '#999', // Cor do texto quando desabilitado
+    backgroundColor: '#f5f5f5',
+    color: '#999',
+  },
+  popupOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  popupContent: {
+    width: 200,
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  successMessage: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  successButton: {
+    backgroundColor: '#198754',
+    borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignItems: 'center',
   },
 });

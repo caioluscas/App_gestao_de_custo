@@ -24,7 +24,10 @@ export default function Actions() {
         
     </TouchableOpacity>
     
-    <TouchableOpacity style={styles.actionButton}>
+    <TouchableOpacity 
+        style={styles.actionButton}
+        onPress={() => navigation.navigate('Saidas')}
+    >
         <View style={styles.areaButton}>
             <AntDesign name="arrowdown" size={26} color="#000"/>
         </View>
@@ -56,9 +59,6 @@ export default function Actions() {
     </TouchableOpacity>
     
    </ScrollView>
-   
-   
-   
   );
 }
 

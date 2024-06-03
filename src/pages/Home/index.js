@@ -10,7 +10,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { TouchableOpacity } from 'react-native';
 import ModalGasto from '../../Components/ModalGasto';
 import ModalEntrada from '../../Components/ModalEntrada';
-
+import Saidas from '../Saidas';
 
 
 const list = [

@@ -44,7 +44,7 @@ export default function ModalGasto({ onSuccess }) {
     };
 
     console.log('Dados a serem enviados:', dados);
-    
+
     try {
       const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
         headers: {
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addButton: {
-    backgroundColor: '#198754',
+    backgroundColor: '#e32636',
     borderRadius: 50,
     padding: 20,
     position: 'absolute',

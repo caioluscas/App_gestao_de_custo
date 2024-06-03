@@ -3,13 +3,12 @@ import Header from '../../Components/Header';
 import Balance from '../../Components/Balance';
 import Movements from '../../Components/Movements';
 import Actions from '../../Components/Actions';
-import ModalHome from '../../Components/ModalGasto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { TouchableOpacity } from 'react-native';
+import axios from 'axios';
 import ModalGasto from '../../Components/ModalGasto';
 import ModalEntrada from '../../Components/ModalEntrada';
+<<<<<<< HEAD
 import Saidas from '../Saidas';
 
 
@@ -86,10 +85,45 @@ const list = [
   }
 
 ]
+=======
+>>>>>>> 738eeb1bdb84e72cc70afdb739119d98a12b119f
 
 export default function Home() {
-
   const [login, setLogin] = useState('');
+  const [movements, setMovements] = useState([]);
+  const [balance, setBalance] = useState({ saldo: '0', gastos: '0' });
+
+  const fetchMovements = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+        headers: {
+          'Authorization': 'Bearer ' + global.userToken
+        }
+      });
+
+      const { valorDisponivel, listaDeMovimentacoes } = response.data;
+
+      // Transformar os dados de movimentações
+      const formattedMovements = listaDeMovimentacoes.map(mov => ({
+        id: mov.id,
+        label: mov.descricao,
+        value: Math.abs(mov.valor).toFixed(2),
+        date: mov.dataEntrada,
+        type: mov.valor >= 0 ? 1 : 0  // Assumindo que valores positivos são entradas e negativos são gastos
+      }));
+
+      setMovements(formattedMovements);
+      setBalance({
+        saldo: valorDisponivel.toFixed(2),
+        gastos: listaDeMovimentacoes
+          .filter(item => item.valor < 0)
+          .reduce((acc, item) => acc + Math.abs(item.valor), 0)
+          .toFixed(2)
+      });
+    } catch (error) {
+      console.log('Erro ao obter os movimentos:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchLogin = async () => {
@@ -107,14 +141,14 @@ export default function Home() {
     };
 
     fetchLogin();
-  });
-
+    fetchMovements();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Header name={login} />
 
-      <Balance saldo="28980.10" gastos="444" />
+      <Balance saldo={balance.saldo} gastos={balance.gastos} />
 
       <Actions />
 
@@ -122,19 +156,17 @@ export default function Home() {
         <Text style={styles.title}>Todas as movimentações</Text>
       </View>
 
-
       <FlatList
         style={styles.list}
-        data={list}
+        contentContainerStyle={styles.listContent}
+        data={movements}
         keyExtractor={(item) => String(item.id)}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => <Movements data={item} />}
       />
 
-      <ModalEntrada/>
-
-      <ModalGasto />
-      
+      <ModalEntrada />
+      <ModalGasto onSuccess={fetchMovements} />
     </View>
   );
 }
@@ -159,5 +191,8 @@ const styles = StyleSheet.create({
   list: {
     marginStart: 14,
     marginEnd: 14,
-  }
+  },
+  listContent: {
+    paddingBottom: 100, // Adiciona um padding para evitar sobreposição com os botões
+  },
 });

@@ -6,6 +6,8 @@ import Home from "../pages/Home";
 import Grafico from "../pages/Grafico";
 import Perfil from "../pages/Perfil";
 import ModalEntrada from "../Components/ModalEntrada";
+import Saidas from "../pages/Saidas";
+import Entradas from "../pages/Entradas";
 
 
 const Stack = createNativeStackNavigator();
@@ -51,6 +53,17 @@ export default function Routes() {
         options={{headerShown: false}}
         />
 
+        <Stack.Screen
+        name="Saidas"
+        component={Saidas}
+        options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+        name="Entradas"
+        component={Entradas}
+        options={{headerShown: false}}
+        />
         
     </Stack.Navigator>
   )

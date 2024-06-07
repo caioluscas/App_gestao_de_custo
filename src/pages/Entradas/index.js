@@ -5,7 +5,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import { useNavigation } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 
-export default function Saidas() {
+export default function Entradas() {
   const navigation = useNavigation();
   return (
     <View style={styles.container}>
@@ -17,7 +17,7 @@ export default function Saidas() {
       </TouchableOpacity>
 
       <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
-        <Text style={styles.title}>Saídas</Text>
+        <Text style={styles.title}>Entradas</Text>
       </Animatable.View>
 
       <View style={styles.dropdownContainer}>
@@ -25,7 +25,7 @@ export default function Saidas() {
           onValueChange={(value) => console.log(value)}
           items={[
             { label: 'Todos', value: 'todos' },
-            { label: 'Saidas', value: 'saidas' },
+            { label: 'Entradas', value: 'entradas' },
           ]}
           placeholder={{ label: 'Selecione uma opção...', value: null }}
           style={pickerSelectStyles}

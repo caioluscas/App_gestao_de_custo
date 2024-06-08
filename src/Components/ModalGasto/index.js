@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal } from 'react-native';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import Select from 'react-select';
 
 export default function ModalGasto({ onSuccess }) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [successPopupIsOpen, setSuccessPopupIsOpen] = useState(false);
-  const [local, setLocal] = useState(''); // Certifique-se de que o nome do estado está em minúsculas
+  const [local, setLocal] = useState('');
   const [descricao, setDescricao] = useState('');
   const [parcelas, setParcelas] = useState('');
   const [valorParcela, setValorParcela] = useState('');
@@ -40,7 +41,7 @@ export default function ModalGasto({ onSuccess }) {
       parcelas: eparcela ? parseInt(parcelas) : 0,
       valorParcela: eparcela ? parseFloat(valorParcela) : 0,
       descricao: descricao,
-      Local: local, // Certifique-se de que o valor de "local" está sendo incluído corretamente
+      Local: local,
     };
 
     console.log('Dados a serem enviados:', dados);
@@ -94,6 +95,13 @@ export default function ModalGasto({ onSuccess }) {
     }
   }, [parcelas, valorParcela, eparcela]);
 
+  const options = [
+    { value: 'Entretenimento', label: 'Entretenimento' },
+    { value: 'Alimentação', label: 'Alimentação' },
+    { value: 'Transporte', label: 'Transporte' },
+    { value: 'Outros', label: 'Outros' }
+  ];
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.addButton} onPress={abrirModal}>
@@ -109,11 +117,19 @@ export default function ModalGasto({ onSuccess }) {
           <View style={styles.modalContent}>
             <Text style={styles.message}>Informe os dados do gasto</Text>
 
+            <View style={styles.selectContainer}>
+              <Select 
+                options={options} 
+                styles={customSelectStyles}
+                placeholder='Selecione a categoria'
+              />
+            </View>
+
             <Text style={styles.title}>Local:</Text>
             <TextInput
               placeholder='Digite o local'
               style={styles.input}
-              value={local} // Certifique-se de que o valor de "local" está sendo atribuído corretamente
+              value={local}
               onChangeText={text => setLocal(text)}
             />
 
@@ -197,6 +213,46 @@ export default function ModalGasto({ onSuccess }) {
   );
 }
 
+const customSelectStyles = {
+  control: (provided) => ({
+    ...provided,
+    height: 40,
+    marginBottom: 12,
+    fontSize: 16,
+    backgroundColor: 'white', // Fundo branco
+  }),
+  valueContainer: (provided) => ({
+    ...provided,
+    height: '100%',
+    padding: '0 10px',
+  }),
+  input: (provided) => ({
+    ...provided,
+    margin: 0,
+    padding: 0,
+    fontSize: 16,
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    fontSize: 16,
+  }),
+  placeholder: (provided) => ({
+    ...provided,
+    fontSize: 16,
+  }),
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: 'white', // Fundo branco
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected ? '#e32636' : state.isFocused ? '#f0f0f0' : 'white', // Fundo das opções
+    color: 'black',
+    padding: 10,
+    fontSize: 16,
+  }),
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -232,6 +288,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  selectContainer: {
+    width: '100%',
+    marginBottom: 12,
   },
   title: {
     fontSize: 16,

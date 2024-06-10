@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ModalGasto from '../../Components/ModalGasto';
 import ModalEntrada from '../../Components/ModalEntrada';
+import { format } from 'date-fns';
 
 export default function Home() {
   const [login, setLogin] = useState('');
@@ -29,7 +30,7 @@ export default function Home() {
         id: mov.id,
         label: mov.descricao,
         value: Math.abs(mov.valor).toFixed(2),
-        date: mov.dataEntrada,
+        date: format(new Date(mov.dataEntrada), 'dd/MM/yyyy'), // Formatar a data
         type: mov.valor >= 0 ? 1 : 0  // Assumindo que valores positivos são entradas e negativos são gastos
       }));
 

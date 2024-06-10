@@ -12,7 +12,7 @@ import ModalEntrada from '../../Components/ModalEntrada';
 export default function Home() {
   const [login, setLogin] = useState('');
   const [movements, setMovements] = useState([]);
-  const [balance, setBalance] = useState({ saldo: '0', gastos: '0' });
+  const [balance, setBalance] = useState({ saldo: '0', gastos: '0', totalGastos: '0' });
 
   const fetchMovements = async () => {
     try {
@@ -33,13 +33,19 @@ export default function Home() {
         type: mov.valor >= 0 ? 1 : 0  // Assumindo que valores positivos são entradas e negativos são gastos
       }));
 
+      const entradas = listaDeMovimentacoes
+        .filter(item => item.valor >= 0)
+        .reduce((acc, item) => acc + item.valor, 0);
+
+      const gastos = listaDeMovimentacoes
+        .filter(item => item.valor < 0)
+        .reduce((acc, item) => acc + Math.abs(item.valor), 0);
+
       setMovements(formattedMovements);
       setBalance({
-        saldo: valorDisponivel.toFixed(2),
-        gastos: listaDeMovimentacoes
-          .filter(item => item.valor < 0)
-          .reduce((acc, item) => acc + Math.abs(item.valor), 0)
-          .toFixed(2)
+        saldo: (entradas - gastos).toFixed(2),
+        gastos: entradas.toFixed(2),
+        totalGastos: gastos.toFixed(2)
       });
     } catch (error) {
       console.log('Erro ao obter os movimentos:', error);
@@ -69,7 +75,7 @@ export default function Home() {
     <View style={styles.container}>
       <Header name={login} />
 
-      <Balance saldo={balance.saldo} gastos={balance.gastos} />
+      <Balance saldo={balance.saldo} gastos={balance.gastos} totalGastos={balance.totalGastos} />
 
       <Actions />
 

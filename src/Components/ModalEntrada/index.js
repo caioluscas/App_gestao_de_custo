@@ -3,13 +3,13 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal } from 'reac
 import { PlusCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
-
 export default function ModalEntrada() {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [successPopupIsOpen, setSuccessPopupIsOpen] = useState(false);
   const [local, setLocal] = useState('');
   const [descricao, setDescricao] = useState('');
   const [valorGasto, setValorGasto] = useState('');
+  const [refresh, setRefresh] = useState(false); // Novo estado para controlar o refresh
 
   const resetFields = () => {
     setLocal('');
@@ -44,7 +44,7 @@ export default function ModalEntrada() {
       const idCarteira = carteiraResponse.data.idCarteira;
       dados.idCarteira = idCarteira;
 
-      const gastoResponse = await axios.post('http://localhost:8080/user/gasto', dados, {
+      const gastoResponse = await axios.post('http://localhost:8080/user/entrada', dados, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }
@@ -64,12 +64,17 @@ export default function ModalEntrada() {
   const fecharModal = () => {
     setIsOpen(false);
     resetFields();
+    setRefresh(!refresh); // Atualiza o estado de refresh
   };
 
   const fecharPopupSucesso = () => {
     setSuccessPopupIsOpen(false);
     fecharModal();
   };
+
+  useEffect(() => {
+    // Adicione aqui qualquer código que precise ser executado quando o componente re-renderizar
+  }, [refresh]); // O useEffect será chamado sempre que o estado de refresh mudar
 
   return (
     <View style={styles.container}>

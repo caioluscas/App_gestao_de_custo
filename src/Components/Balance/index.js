@@ -22,7 +22,7 @@ export default function Balance({ saldo, gastos, totalGastos }) {
     >
 
       <View style={styles.item}>
-        <Text style={styles.itemTitle}>Entradas no mês</Text>
+        <Text style={styles.itemTitle}>Saldo</Text>
         <View style={styles.content}>
           <Text style={styles.currencySymbol}>R$</Text>
           <Text style={styles.balance}>{saldo}</Text>
@@ -38,10 +38,10 @@ export default function Balance({ saldo, gastos, totalGastos }) {
       </View>
 
       <View style={styles.item}>
-        <Text style={styles.itemTitle}>Saldo</Text>
+        <Text style={styles.itemTitle}>Entradas no mês</Text>
         <View style={styles.content}>
           <Text style={styles.currencySymbol}>R$</Text>
-          <Text style={styles.balance}>{gastos}</Text>
+          <Text style={styles.gastos}>{gastos}</Text>
         </View>
       </View>
 
@@ -83,14 +83,14 @@ const styles = StyleSheet.create({
   },
   balance: {
     fontSize: 22,
-    color: '#2ecc71'
+    color: '#7f8c8d' // Cor cinza
   },
   totalGastos: {
     fontSize: 22,
-    color: '#f39c12'
+    color: '#e74c3c' // Cor vermelha
   },
-  expenses: {
+  gastos: {
     fontSize: 22,
-    color: '#e74c3c'
+    color: '#2ecc71' // Cor verde
   }
 });

@@ -93,9 +93,14 @@ export default function Home() {
         renderItem={({ item }) => <Movements data={item} />}
       />
 
-      <ModalEntrada />
-      
-      <ModalGasto onSuccess={fetchMovements} />
+      <View style={styles.buttonContainer}>
+        <View style={styles.buttonWrapper}>
+          <ModalEntrada onSuccess={fetchMovements} />
+        </View>
+        <View style={styles.buttonWrapper}>
+          <ModalGasto onSuccess={fetchMovements} />
+        </View>
+      </View>
     </View>
   );
 }
@@ -122,6 +127,19 @@ const styles = StyleSheet.create({
     marginEnd: 14,
   },
   listContent: {
-    paddingBottom: 100, // Adiciona um padding para evitar sobreposição com os botões
+    paddingBottom: 150, // Adiciona um padding para evitar sobreposição com os botões
+  },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+  },
+  buttonWrapper: {
+    flex: 1,
+    alignItems: 'center',
   },
 });

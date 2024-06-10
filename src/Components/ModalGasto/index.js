@@ -220,6 +220,7 @@ const customSelectStyles = {
     marginBottom: 12,
     fontSize: 16,
     backgroundColor: 'white', // Fundo branco
+    zIndex: 10,
   }),
   valueContainer: (provided) => ({
     ...provided,
@@ -243,6 +244,7 @@ const customSelectStyles = {
   menu: (provided) => ({
     ...provided,
     backgroundColor: 'white', // Fundo branco
+    zIndex: 20,
   }),
   option: (provided, state) => ({
     ...provided,
@@ -283,6 +285,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
+    zIndex: 1, // Garantir que a modal tenha zIndex maior que o select
   },
   message: {
     fontSize: 18,
@@ -292,6 +295,7 @@ const styles = StyleSheet.create({
   selectContainer: {
     width: '100%',
     marginBottom: 12,
+    zIndex: 10,
   },
   title: {
     fontSize: 16,

@@ -3,13 +3,12 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal } from 'reac
 import { PlusCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
-export default function ModalEntrada() {
+export default function ModalEntrada({ onSuccess }) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [successPopupIsOpen, setSuccessPopupIsOpen] = useState(false);
   const [local, setLocal] = useState('');
   const [descricao, setDescricao] = useState('');
   const [valorGasto, setValorGasto] = useState('');
-  const [refresh, setRefresh] = useState(false); // Novo estado para controlar o refresh
 
   const resetFields = () => {
     setLocal('');
@@ -52,6 +51,9 @@ export default function ModalEntrada() {
 
       console.log('Resposta do servidor (gasto):', gastoResponse.data);
       setSuccessPopupIsOpen(true);
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       console.error('Erro ao enviar requisição:', error);
     }
@@ -64,17 +66,12 @@ export default function ModalEntrada() {
   const fecharModal = () => {
     setIsOpen(false);
     resetFields();
-    setRefresh(!refresh); // Atualiza o estado de refresh
   };
 
   const fecharPopupSucesso = () => {
     setSuccessPopupIsOpen(false);
     fecharModal();
   };
-
-  useEffect(() => {
-    // Adicione aqui qualquer código que precise ser executado quando o componente re-renderizar
-  }, [refresh]); // O useEffect será chamado sempre que o estado de refresh mudar
 
   return (
     <View style={styles.container}>

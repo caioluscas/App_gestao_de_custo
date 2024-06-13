@@ -65,25 +65,29 @@ export default function Movements({ data }) {
 
       {/* Modal de informações */}
       <Modal visible={modalInfoVisible} animationType="slide" onRequestClose={() => setModalInfoVisible(false)}>
-        <View style={styles.modalContent}>
-          <Text>Informações do gasto:</Text>
-          <Text>Data: {data.date}</Text>
-          <Text>Descrição: {data.label}</Text>
-          <Text>Valor: {data.value}</Text>
-          <TouchableOpacity onPress={() => setModalInfoVisible(false)}>
-            <Text>Fechar</Text>
-          </TouchableOpacity>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Informações do gasto:</Text>
+            <Text>Data: {data.date}</Text>
+            <Text>Descrição: {data.label}</Text>
+            <Text>Valor: {data.type === 1 ? `R$ ${data.value}` : `R$ -${data.value}`}</Text>
+            <TouchableOpacity style={[styles.button, styles.closeButton]} onPress={() => setModalInfoVisible(false)}>
+              <Text style={styles.buttonText}>Fechar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
 
       {/* Modal de edição */}
       <Modal visible={modalEditVisible} animationType="slide" onRequestClose={() => setModalEditVisible(false)}>
-        <View style={styles.modalContent}>
-          <Text>Editar informações do gasto:</Text>
-          {/* Adicione aqui os campos para editar as informações */}
-          <TouchableOpacity onPress={() => setModalEditVisible(false)}>
-            <Text>Fechar</Text>
-          </TouchableOpacity>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar informações do gasto:</Text>
+            {/* Adicione aqui os campos para editar as informações */}
+            <TouchableOpacity style={[styles.button, styles.closeButton]} onPress={() => setModalEditVisible(false)}>
+              <Text style={styles.buttonText}>Fechar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </TouchableOpacity>
@@ -130,17 +134,43 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     marginTop: 10,
   },
   icon: {
     fontSize: 24,
-    marginHorizontal: 10,
+    marginRight: 10,
   },
-  modalContent: {
+  modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    maxWidth: 400,
+    backgroundColor: '#FFF',
+    borderRadius: 20,
     padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  button: {
+    borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  closeButton: {
+    backgroundColor: '#dc3545', // Cor vermelha para o botão de fechar
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 16,
   },
 });

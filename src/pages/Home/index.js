@@ -1,10 +1,10 @@
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 import Header from '../../Components/Header';
 import Balance from '../../Components/Balance';
 import Movements from '../../Components/Movements';
 import Actions from '../../Components/Actions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ModalGasto from '../../Components/ModalGasto';
 import ModalEntrada from '../../Components/ModalEntrada';

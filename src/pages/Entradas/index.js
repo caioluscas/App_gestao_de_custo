@@ -1,12 +1,45 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
-import { AntDesign } from '@expo/vector-icons'; // Assumindo que você está usando o Expo
-import RNPickerSelect from 'react-native-picker-select';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { AntDesign } from '@expo/vector-icons'; 
+import axios from 'axios';
+import { format } from 'date-fns';
 import { useNavigation } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 
 export default function Entradas() {
+  const [entradas, setEntradas] = useState([]);
   const navigation = useNavigation();
+
+  const fetchEntradas = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+        headers: {
+          'Authorization': 'Bearer ' + global.userToken
+        }
+      });
+
+      const { listaDeMovimentacoes } = response.data;
+
+      // Filtrar e formatar os dados de entradas
+      const formattedEntradas = listaDeMovimentacoes
+        .filter(mov => mov.valor > 0)
+        .map(mov => ({
+          id: mov.id,
+          label: mov.descricao,
+          value: mov.valor.toFixed(2),
+          date: format(new Date(mov.dataEntrada), 'dd/MM/yyyy')
+        }));
+
+      setEntradas(formattedEntradas);
+    } catch (error) {
+      console.log('Erro ao obter as entradas:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEntradas();
+  }, []);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -20,17 +53,19 @@ export default function Entradas() {
         <Text style={styles.title}>Entradas</Text>
       </Animatable.View>
 
-      <View style={styles.dropdownContainer}>
-        <RNPickerSelect
-          onValueChange={(value) => console.log(value)}
-          items={[
-            { label: 'Todos', value: 'todos' },
-            { label: 'Entradas', value: 'entradas' },
-          ]}
-          placeholder={{ label: 'Selecione uma opção...', value: null }}
-          style={pickerSelectStyles}
-        />
-      </View>
+      <FlatList
+        style={styles.list}
+        data={entradas}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={({ item }) => (
+          <View style={styles.item}>
+            <Text style={styles.date}>{item.date}</Text>
+            <Text style={styles.label}>{item.label}</Text>
+            <Text style={styles.value}>R$ {item.value}</Text>
+          </View>
+        )}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 }
@@ -38,47 +73,42 @@ export default function Entradas() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    paddingTop: 50, // Ajuste conforme necessário para a barra de status
-    paddingHorizontal: 20, // Ajuste conforme necessário para o preenchimento lateral
+    paddingTop: 50, 
+    paddingHorizontal: 20,
   },
   backButton: {
     padding: 10,
     backgroundColor: 'lightgrey',
     borderRadius: 5,
-    marginBottom: 20, // Espaço entre o botão e o dropdown
+    marginBottom: 20, 
   },
-  dropdownContainer: {
-    width: '100%',
+  containerHeader: {
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+  },
+  list: {
+    flex: 1,
+  },
+  item: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  date: {
+    fontSize: 16,
+    color: '#666',
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  value: {
+    fontSize: 16,
+    color: '#2ecc71',
   },
 });
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 4,
-    color: 'black',
-    paddingRight: 30, // Para garantir que o texto não sobreponha o ícone de dropdown
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: 'purple',
-    borderRadius: 8,
-    color: 'black',
-    paddingRight: 30, // Para garantir que o texto não sobreponha o ícone de dropdown
-  },
-});
-

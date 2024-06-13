@@ -47,7 +47,7 @@ export default function ModalGasto({ onSuccess }) {
     console.log('Dados a serem enviados:', dados);
 
     try {
-      const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+        carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }

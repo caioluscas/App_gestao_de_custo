@@ -13,6 +13,10 @@ export default function ModalGasto({ onSuccess }) {
   const [valorParcela, setValorParcela] = useState('');
   const [valorGasto, setValorGasto] = useState('');
   const [eparcela, setEParcela] = useState(false);
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
+
+
+
 
   const resetFields = () => {
     setLocal('');
@@ -42,12 +46,17 @@ export default function ModalGasto({ onSuccess }) {
       valorParcela: eparcela ? parseFloat(valorParcela) : 0,
       descricao: descricao,
       Local: local,
+      categoria: categoriaSelecionada
+    };
+
+    const handleCategoriaChange = (selectedOption) => {
+      setCategoriaSelecionada(selectedOption);
     };
 
     console.log('Dados a serem enviados:', dados);
 
     try {
-        carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+      carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }
@@ -96,10 +105,10 @@ export default function ModalGasto({ onSuccess }) {
   }, [parcelas, valorParcela, eparcela]);
 
   const options = [
-    { value: 'Entretenimento', label: 'Entretenimento' },
-    { value: 'Alimentação', label: 'Alimentação' },
-    { value: 'Transporte', label: 'Transporte' },
-    { value: 'Outros', label: 'Outros' }
+    { value: 'ENTRETERIMENTO', label: 'Entretenimento' },
+    { value: 'ALIMENTAÇÃO', label: 'Alimentação' },
+    { value: 'TRANSPORTE', label: 'Transporte' },
+    { value: 'OUTROS', label: 'Outros' }
   ];
 
   return (
@@ -118,11 +127,14 @@ export default function ModalGasto({ onSuccess }) {
             <Text style={styles.message}>Informe os dados do gasto</Text>
 
             <View style={styles.selectContainer}>
-              <Select 
-                options={options} 
+              <Select
+                options={options}
                 styles={customSelectStyles}
                 placeholder='Selecione a categoria'
+                value={categoriaSelecionada}
+                onChangeText={text => setCategoriaSelecionada(text)}
               />
+
             </View>
 
             <Text style={styles.title}>Local:</Text>

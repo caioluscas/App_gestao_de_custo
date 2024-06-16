@@ -15,9 +15,6 @@ export default function ModalGasto({ onSuccess }) {
   const [eparcela, setEParcela] = useState(false);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
 
-
-
-
   const resetFields = () => {
     setLocal('');
     setDescricao('');
@@ -28,7 +25,7 @@ export default function ModalGasto({ onSuccess }) {
   };
 
   const handleSalvarGasto = async () => {
-    if (!local || !descricao || (eparcela && (!parcelas || !valorParcela)) || (!eparcela && !valorGasto)) {
+    if (!local || !descricao || (eparcela && (!parcelas || !valorParcela)) || (!eparcela && !valorGasto) || !categoriaSelecionada) {
       alert('Por favor, preencha todos os campos.');
       return;
     }
@@ -46,17 +43,13 @@ export default function ModalGasto({ onSuccess }) {
       valorParcela: eparcela ? parseFloat(valorParcela) : 0,
       descricao: descricao,
       Local: local,
-      categoria: categoriaSelecionada
-    };
-
-    const handleCategoriaChange = (selectedOption) => {
-      setCategoriaSelecionada(selectedOption);
+      categoria: categoriaSelecionada ? categoriaSelecionada.value : null
     };
 
     console.log('Dados a serem enviados:', dados);
 
     try {
-      carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+      const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }
@@ -111,6 +104,10 @@ export default function ModalGasto({ onSuccess }) {
     { value: 'OUTROS', label: 'Outros' }
   ];
 
+  const handleCategoriaChange = (selectedOption) => {
+    setCategoriaSelecionada(selectedOption);
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.addButton} onPress={abrirModal}>
@@ -132,9 +129,8 @@ export default function ModalGasto({ onSuccess }) {
                 styles={customSelectStyles}
                 placeholder='Selecione a categoria'
                 value={categoriaSelecionada}
-                onChangeText={text => setCategoriaSelecionada(text)}
+                onChange={handleCategoriaChange} // Corrigido para onChange
               />
-
             </View>
 
             <Text style={styles.title}>Local:</Text>

@@ -86,7 +86,7 @@ export default function ModalEntrada({ onSuccess }) {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.message}>Informe os dados do gasto</Text>
+            <Text style={styles.message}>Informe os dados da entrada</Text>
 
             <Text style={styles.title}>Local:</Text>
             <TextInput

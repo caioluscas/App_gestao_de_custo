@@ -8,6 +8,7 @@ export default function Movements({ data }) {
   const [showValue, setShowValue] = useState(false);
   const [modalInfoVisible, setModalInfoVisible] = useState(false);
   const [modalEditVisible, setModalEditVisible] = useState(false);
+  const [modalDeleteVisible, setModalDeleteVisible] = useState(false);
 
   const handleDelete = () => {
     // Função para deletar o gasto
@@ -58,7 +59,7 @@ export default function Movements({ data }) {
         <TouchableOpacity onPress={() => setModalEditVisible(true)}>
           <FontAwesomeIcon icon={faSquarePen} style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleDelete}>
+        <TouchableOpacity onPress={() => setModalDeleteVisible(true)}>
           <FontAwesomeIcon icon={faTrash} style={styles.icon} />
         </TouchableOpacity>
       </View>
@@ -90,6 +91,36 @@ export default function Movements({ data }) {
           </View>
         </View>
       </Modal>
+
+      
+      {/* Modal de deletar */}
+      <Modal
+            visible={modalDeleteVisible}
+            animationType="slide"
+            onRequestClose={() => setModalDeleteVisible(false)}
+        >
+            <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Confirmar exclusão:</Text>
+                    <Text>Tem certeza de que deseja excluir este gasto?</Text>
+                    <View style={styles.buttonRow}>
+                        <TouchableOpacity
+                            style={[styles.button, styles.closeButton]}
+                            onPress={() => { handleDelete(); setModalDeleteVisible(false); }}
+                        >
+                            <Text style={styles.buttonText}>Excluir</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.button, styles.cancelButton]}
+                            onPress={() => setModalDeleteVisible(false)}
+                        >
+                            <Text style={styles.buttonText}>Cancelar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        </Modal>
+
     </TouchableOpacity>
   );
 }
@@ -160,6 +191,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 20,
+},
   button: {
     borderRadius: 4,
     paddingVertical: 10,
@@ -168,6 +205,9 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     backgroundColor: '#dc3545', // Cor vermelha para o botão de fechar
+  },
+  cancelButton:{
+    backgroundColor: '#C0C0C0', // Cor cinza para o botão de fechar no modal de cancelar
   },
   buttonText: {
     color: '#FFF',

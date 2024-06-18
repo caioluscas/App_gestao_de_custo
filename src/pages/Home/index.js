@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ModalGasto from '../../Components/ModalGasto';
 import ModalEntrada from '../../Components/ModalEntrada';
-import { format } from 'date-fns';
+import { addMonths, format } from 'date-fns';
 
 export default function Home() {
   const [login, setLogin] = useState('');
@@ -29,11 +29,12 @@ export default function Home() {
       listaDeMovimentacoes.forEach(mov => {
         if (mov.eparcela) {
           for (let i = 0; i < mov.parcelas; i++) {
+            const parcelaDate = addMonths(new Date(mov.dataEntrada), i);
             formattedMovements.push({
               id: `${mov.id}-${i + 1}`,
               label: `${mov.descricao} - Parcela ${i + 1}/${mov.parcelas}`,
               value: Math.abs(mov.valorParcela).toFixed(2),
-              date: format(new Date(mov.dataEntrada), 'dd/MM/yyyy'),
+              date: format(parcelaDate, 'dd/MM/yyyy'),
               type: mov.valor >= 0 ? 1 : 0
             });
           }

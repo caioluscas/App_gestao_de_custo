@@ -25,13 +25,12 @@ export default function Home() {
 
       const { valorDisponivel, listaDeMovimentacoes } = response.data;
 
-      // Transformar os dados de movimentações
       const formattedMovements = listaDeMovimentacoes.map(mov => ({
         id: mov.id,
         label: mov.descricao,
         value: Math.abs(mov.valor).toFixed(2),
-        date: format(new Date(mov.dataEntrada), 'dd/MM/yyyy'), // Formatar a data
-        type: mov.valor >= 0 ? 1 : 0  // Assumindo que valores positivos são entradas e negativos são gastos
+        date: format(new Date(mov.dataEntrada), 'dd/MM/yyyy'),
+        type: mov.valor >= 0 ? 1 : 0
       }));
 
       const entradas = listaDeMovimentacoes
@@ -75,25 +74,22 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <Header name={login} />
-
       <Balance saldo={balance.saldo} gastos={balance.gastos} totalGastos={balance.totalGastos} />
-
-      <Actions />
-
-      <View style={styles.header}>
-        <Text style={styles.title}>Todas as movimentações</Text>
+      <View style={styles.mainContent}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Todas as movimentações</Text>
+        </View>
+        <FlatList
+          style={styles.list}
+          contentContainerStyle={styles.listContent}
+          data={movements}
+          keyExtractor={(item) => String(item.id)}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => <Movements data={item} />}
+        />
       </View>
-
-      <FlatList
-        style={styles.list}
-        contentContainerStyle={styles.listContent}
-        data={movements}
-        keyExtractor={(item) => String(item.id)}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => <Movements data={item} />}
-      />
-
-      <View style={styles.buttonContainer}>
+      <View style={styles.actionsContainer}>
+        <Actions />
         <View style={styles.buttonWrapper}>
           <ModalEntrada onSuccess={fetchMovements} />
         </View>
@@ -109,6 +105,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fafafa',
+  },
+  mainContent: {
+    flex: 1, // Garante que a lista de movimentações ocupe o espaço restante
   },
   header: {
     flexDirection: 'row',
@@ -127,16 +126,13 @@ const styles = StyleSheet.create({
     marginEnd: 14,
   },
   listContent: {
-    paddingBottom: 150, // Adiciona um padding para evitar sobreposição com os botões
+    paddingBottom: 200, // Adiciona um padding para evitar sobreposição com os botões
   },
-  buttonContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
+  actionsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     paddingHorizontal: 14,
+    paddingBottom: 20,
   },
   buttonWrapper: {
     flex: 1,

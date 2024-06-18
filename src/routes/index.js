@@ -8,6 +8,7 @@ import Perfil from "../pages/Perfil";
 import ModalEntrada from "../Components/ModalEntrada";
 import Saidas from "../pages/Saidas";
 import Entradas from "../pages/Entradas";
+import LancamentosFuturos from "../pages/LancamentosFuturos";
 
 
 const Stack = createNativeStackNavigator();
@@ -62,6 +63,12 @@ export default function Routes() {
         <Stack.Screen
         name="Entradas"
         component={Entradas}
+        options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+        name="LancamentosFuturos"
+        component={LancamentosFuturos}
         options={{headerShown: false}}
         />
         

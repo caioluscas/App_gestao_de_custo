@@ -9,6 +9,7 @@ export default function ModalEntrada({ onSuccess }) {
   const [local, setLocal] = useState('');
   const [descricao, setDescricao] = useState('');
   const [valorGasto, setValorGasto] = useState('');
+  
 
   const resetFields = () => {
     setLocal('');
@@ -40,7 +41,7 @@ export default function ModalEntrada({ onSuccess }) {
 
       console.log('Resposta do servidor (carteira):', carteiraResponse.data);
 
-      const idCarteira = carteiraResponse.data.idCarteira;
+      global.idCarteira = carteiraResponse.data.idCarteira;
       dados.idCarteira = idCarteira;
 
       const gastoResponse = await axios.post('http://localhost:8080/user/entrada', dados, {

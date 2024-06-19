@@ -22,44 +22,40 @@ export default function Home() {
           'Authorization': 'Bearer ' + global.userToken
         }
       });
-  
+
       const { valorDisponivel, listaDeMovimentacoes } = response.data;
-  
-      const formattedMovements = [];
-      listaDeMovimentacoes.forEach(mov => {
+
+      const formattedMovements = listaDeMovimentacoes.map(mov => {
         if (mov.eparcela) {
-          for (let i = 0; i < mov.parcelas; i++) {
-            const parcelaDate = addMonths(new Date(mov.dataEntrada), i);
-            formattedMovements.push({
-              id: `${mov.id}-${i + 1}`,
-              label: `${mov.descricao} - Parcela ${i + 1}/${mov.parcelas}`,
-              value: Math.abs(mov.valorParcela).toFixed(2),
-              date: format(parcelaDate, 'dd/MM/yyyy'),
-              type: mov.valor >= 0 ? 1 : 0
-            });
-          }
+          return {
+            id: mov.id,
+            label: `${mov.descricao} ${mov.parcelaAtual}/${mov.parcelas}`,
+            value: Math.abs(mov.valorParcela).toFixed(2),
+            date: format(new Date(mov.dataEntrada), 'dd/MM/yyyy'),
+            type: mov.valor >= 0 ? 1 : 0
+          };
         } else {
-          formattedMovements.push({
+          return {
             id: mov.id,
             label: mov.descricao,
             value: Math.abs(mov.valor).toFixed(2),
             date: format(new Date(mov.dataEntrada), 'dd/MM/yyyy'),
             type: mov.valor >= 0 ? 1 : 0
-          });
+          };
         }
       });
-  
+
       const entradas = listaDeMovimentacoes
         .filter(item => item.valor >= 0)
         .reduce((acc, item) => acc + item.valor, 0);
-  
+
       const gastos = listaDeMovimentacoes
         .filter(item => item.valor < 0)
         .reduce((acc, item) => acc + Math.abs(item.valor), 0);
-  
+
       setMovements(formattedMovements);
       setBalance({
-        saldo: (entradas - gastos).toFixed(2),
+        saldo: valorDisponivel.toFixed(2), // Atualiza saldo com valorDisponivel
         gastos: entradas.toFixed(2),
         totalGastos: gastos.toFixed(2)
       });

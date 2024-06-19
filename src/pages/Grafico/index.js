@@ -17,7 +17,7 @@ export default function Grafico() {
   });
   const [data, setData] = useState([
     ['Linguagens', 'Quantidade'],
-    ['React', 150],
+    ['React', 160],
     ['Angular', 120],
     ['Vue', 80],
   ]);

@@ -15,6 +15,24 @@ export default function Home() {
   const [movements, setMovements] = useState([]);
   const [balance, setBalance] = useState({ saldo: '0', gastos: '0', totalGastos: '0' });
 
+  useEffect(() => {
+    const fetchCarteira = async () => {
+      try {
+        const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+          headers: {
+            'Authorization': 'Bearer ' + global.userToken
+          }
+        });
+        console.log('Resposta do servidor (carteira):', carteiraResponse.data);
+        global.idCarteira = carteiraResponse.data.idCarteira;
+      } catch (error) {
+        console.error('Erro ao obter a carteira:', error);
+      }
+    };
+
+    fetchCarteira();
+  }, []);
+
   const fetchMovements = async () => {
     try {
       const response = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {

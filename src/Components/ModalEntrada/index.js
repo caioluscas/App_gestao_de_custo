@@ -41,7 +41,7 @@ export default function ModalEntrada({ onSuccess }) {
 
       console.log('Resposta do servidor (carteira):', carteiraResponse.data);
 
-      global.idCarteira = carteiraResponse.data.idCarteira;
+      const idCarteira = carteiraResponse.data.idCarteira;
       dados.idCarteira = idCarteira;
 
       const gastoResponse = await axios.post('http://localhost:8080/user/entrada', dados, {

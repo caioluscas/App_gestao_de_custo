@@ -1,20 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { MotiView, AnimatePresence, MotiText } from 'moti';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo, faSquarePen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
 export default function Movements({ data }) {
   const [showValue, setShowValue] = useState(false);
   const [modalInfoVisible, setModalInfoVisible] = useState(false);
   const [modalEditVisible, setModalEditVisible] = useState(false);
   const [modalDeleteVisible, setModalDeleteVisible] = useState(false);
+  const [successPopupIsOpen, setSuccessPopupIsOpen] = useState(false);
+  const [infoData, setInfoData] = useState(null);
 
-  const handleDelete = () => {
-    // Função para deletar o gasto
-    // Chame a API ou execute a lógica necessária para deletar o item
-    console.log('Deletar gasto:', data.id);
+  const dados_delete = {
+    id: data.id,
+    idCarteira: global.idCarteira
   };
+
+  const handleDelete = async () => {
+    if(data.type === 1){
+      try {
+        const response = await axios.delete('http://localhost:8080/user/entrada', {
+          headers: {
+            'Authorization': 'Bearer ' + global.userToken
+          },
+          data: dados_delete
+        });
+        console.log('Resposta do servidor (deletar):', response.data);
+        setModalDeleteVisible(false);
+      } catch (error) {
+        console.error('Erro ao deletar o gasto:', error);
+        console.error('CarteiraId: ', global.idCarteira);
+      }
+    }else{
+      try {
+        const response = await axios.delete('http://localhost:8080/user/gasto', {
+          headers: {
+            'Authorization': 'Bearer ' + global.userToken
+          },
+          data: dados_delete
+        });
+        console.log('Resposta do servidor (deletar):', response.data);
+        setModalDeleteVisible(false);
+      } catch (error) {
+        console.error('Erro ao deletar o gasto:', error);
+        console.error('CarteiraId: ', global.idCarteira);
+      }
+    }
+  };
+
+  const handleInfo = async () => {
+    try {
+      const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+        headers: {
+          'Authorization': 'Bearer ' + global.userToken
+        }
+      });
+
+      console.log('Resposta do servidor (carteira):', carteiraResponse.data);
+      setInfoData(carteiraResponse.data);
+    } catch (error) {
+      console.error('Erro ao enviar requisição:', error);
+    }
+  };
+
+  const handleSave = async (dados) => {
+    try {
+      global.idCarteira = dados.idCarteira;
+      dados.idCarteira = global.idCarteira;
+
+      const gastoResponse = await axios.post('http://localhost:8080/user/entrada', dados, {
+        headers: {
+          'Authorization': 'Bearer ' + global.userToken
+        }
+      });
+
+      console.log('Resposta do servidor (gasto):', gastoResponse.data);
+      setSuccessPopupIsOpen(true);
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
+      console.error('Erro ao enviar requisição:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (modalInfoVisible) {
+      handleInfo();
+    }
+  }, [modalInfoVisible]);
 
   return (
     <TouchableOpacity style={styles.container} onPress={() => setShowValue(!showValue)}>
@@ -68,10 +144,19 @@ export default function Movements({ data }) {
       <Modal visible={modalInfoVisible} animationType="slide" onRequestClose={() => setModalInfoVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Informações do gasto:</Text>
-            <Text>Data: {data.date}</Text>
-            <Text>Descrição: {data.label}</Text>
-            <Text>Valor: {data.type === 1 ? `R$ ${data.value}` : `R$ -${data.value}`}</Text>
+            <Text style={styles.modalTitle}>Informações do gasto/entrada:</Text>
+            {infoData ? (
+              <>
+                <Text>Categoria: {infoData.categoria}</Text>
+                <Text>Data: {data.date}</Text>
+                <Text>Descrição: {data.label}</Text>
+                <Text>Valor: {data.type === 1 ? `R$ ${data.value}` : `R$ -${data.value}`}</Text>
+                <Text>ID da Carteira: {infoData.idCarteira}</Text>
+                <Text>Saldo: R$ {infoData.saldo}</Text>
+              </>
+            ) : (
+              <Text>Carregando...</Text>
+            )}
             <TouchableOpacity style={[styles.button, styles.closeButton]} onPress={() => setModalInfoVisible(false)}>
               <Text style={styles.buttonText}>Fechar</Text>
             </TouchableOpacity>
@@ -83,7 +168,7 @@ export default function Movements({ data }) {
       <Modal visible={modalEditVisible} animationType="slide" onRequestClose={() => setModalEditVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Editar informações do gasto:</Text>
+            <Text style={styles.modalTitle}>Editar informações do gasto/entrada:</Text>
             {/* Adicione aqui os campos para editar as informações */}
             <TouchableOpacity style={[styles.button, styles.closeButton]} onPress={() => setModalEditVisible(false)}>
               <Text style={styles.buttonText}>Fechar</Text>
@@ -92,35 +177,29 @@ export default function Movements({ data }) {
         </View>
       </Modal>
 
-      
       {/* Modal de deletar */}
-      <Modal
-            visible={modalDeleteVisible}
-            animationType="slide"
-            onRequestClose={() => setModalDeleteVisible(false)}
-        >
-            <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                    <Text style={styles.modalTitle}>Confirmar exclusão:</Text>
-                    <Text>Tem certeza de que deseja excluir este gasto?</Text>
-                    <View style={styles.buttonRow}>
-                        <TouchableOpacity
-                            style={[styles.button, styles.closeButton]}
-                            onPress={() => { handleDelete(); setModalDeleteVisible(false); }}
-                        >
-                            <Text style={styles.buttonText}>Excluir</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.button, styles.cancelButton]}
-                            onPress={() => setModalDeleteVisible(false)}
-                        >
-                            <Text style={styles.buttonText}>Cancelar</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+      <Modal visible={modalDeleteVisible} animationType="slide" onRequestClose={() => setModalDeleteVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Confirmar exclusão:</Text>
+            <Text>Tem certeza de que deseja excluir este gasto/entrada?</Text>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.button, styles.closeButton]}
+                onPress={handleDelete}
+              >
+                <Text style={styles.buttonText}>Excluir</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => setModalDeleteVisible(false)}
+              >
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </TouchableOpacity>
             </View>
-        </Modal>
-
+          </View>
+        </View>
+      </Modal>
     </TouchableOpacity>
   );
 }
@@ -196,18 +275,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginTop: 20,
-},
+  },
   button: {
     borderRadius: 4,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    marginTop: 20,
+    width: '45%',
+    alignItems: 'center',
   },
   closeButton: {
-    backgroundColor: '#dc3545', // Cor vermelha para o botão de fechar
+    backgroundColor: '#dc3545', // Cor vermelha para o botão de excluir
   },
-  cancelButton:{
-    backgroundColor: '#C0C0C0', // Cor cinza para o botão de fechar no modal de cancelar
+  cancelButton: {
+    backgroundColor: '#C0C0C0', // Cor cinza para o botão de cancelar
   },
   buttonText: {
     color: '#FFF',

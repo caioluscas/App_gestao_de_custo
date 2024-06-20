@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator, Alert } from 'react-native';
 import { MotiView, AnimatePresence, MotiText } from 'moti';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo, faSquarePen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 
-export default function Movements({ data }) {
+export default function Movements({ data, onSuccess }) {
   const [showValue, setShowValue] = useState(false);
   const [modalInfoVisible, setModalInfoVisible] = useState(false);
   const [modalEditVisible, setModalEditVisible] = useState(false);
   const [modalDeleteVisible, setModalDeleteVisible] = useState(false);
-  const [successPopupIsOpen, setSuccessPopupIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [infoData, setInfoData] = useState(null);
 
   const dados_delete = {
@@ -19,70 +19,41 @@ export default function Movements({ data }) {
   };
 
   const handleDelete = async () => {
-    if(data.type === 1){
-      try {
-        const response = await axios.delete('http://localhost:8080/user/entrada', {
-          headers: {
-            'Authorization': 'Bearer ' + global.userToken
-          },
-          data: dados_delete
-        });
-        console.log('Resposta do servidor (deletar):', response.data);
-        setModalDeleteVisible(false);
-      } catch (error) {
-        console.error('Erro ao deletar o gasto:', error);
-        console.error('CarteiraId: ', global.idCarteira);
-      }
-    }else{
-      try {
-        const response = await axios.delete('http://localhost:8080/user/gasto', {
-          headers: {
-            'Authorization': 'Bearer ' + global.userToken
-          },
-          data: dados_delete
-        });
-        console.log('Resposta do servidor (deletar):', response.data);
-        setModalDeleteVisible(false);
-      } catch (error) {
-        console.error('Erro ao deletar o gasto:', error);
-        console.error('CarteiraId: ', global.idCarteira);
-      }
+    setLoading(true);
+    const endpoint = data.type === 1 ? 'entrada' : 'gasto';
+    try {
+      const response = await axios.delete(`http://localhost:8080/user/${endpoint}`, {
+        headers: {
+          'Authorization': 'Bearer ' + global.userToken
+        },
+        data: dados_delete
+      });
+      console.log('Resposta do servidor (deletar):', response.data);
+      setModalDeleteVisible(false);
+      onSuccess && onSuccess();
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao deletar o gasto. Tente novamente.');
+      console.error('Erro ao deletar o gasto:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleInfo = async () => {
+    setLoading(true);
     try {
-      const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+      const carteiraResponse = await axios.get(`http://localhost:8080/user/carteira/${global.userId}`, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }
       });
-
       console.log('Resposta do servidor (carteira):', carteiraResponse.data);
       setInfoData(carteiraResponse.data);
     } catch (error) {
-      console.error('Erro ao enviar requisição:', error);
-    }
-  };
-
-  const handleSave = async (dados) => {
-    try {
-      global.idCarteira = dados.idCarteira;
-      dados.idCarteira = global.idCarteira;
-
-      const gastoResponse = await axios.post('http://localhost:8080/user/entrada', dados, {
-        headers: {
-          'Authorization': 'Bearer ' + global.userToken
-        }
-      });
-
-      console.log('Resposta do servidor (gasto):', gastoResponse.data);
-      setSuccessPopupIsOpen(true);
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (error) {
-      console.error('Erro ao enviar requisição:', error);
+      Alert.alert('Erro', 'Erro ao buscar informações. Tente novamente.');
+      console.error('Erro ao buscar informações:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -95,7 +66,6 @@ export default function Movements({ data }) {
   return (
     <TouchableOpacity style={styles.container} onPress={() => setShowValue(!showValue)}>
       <Text style={styles.date}>{data.date}</Text>
-
       <View style={styles.content}>
         <Text style={styles.label}>{data.label}</Text>
         {showValue ? (
@@ -145,7 +115,9 @@ export default function Movements({ data }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Informações do gasto/entrada:</Text>
-            {infoData ? (
+            {loading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : infoData ? (
               <>
                 <Text>Categoria: {infoData.categoria}</Text>
                 <Text>Data: {data.date}</Text>
@@ -284,10 +256,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButton: {
-    backgroundColor: '#dc3545', // Cor vermelha para o botão de excluir
+    backgroundColor: '#dc3545',
   },
   cancelButton: {
-    backgroundColor: '#C0C0C0', // Cor cinza para o botão de cancelar
+    backgroundColor: '#C0C0C0',
   },
   buttonText: {
     color: '#FFF',

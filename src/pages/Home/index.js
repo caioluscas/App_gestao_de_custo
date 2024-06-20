@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, Alert } from 'react-native';
 import Header from '../../Components/Header';
 import Balance from '../../Components/Balance';
 import Movements from '../../Components/Movements';
@@ -8,17 +8,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ModalGasto from '../../Components/ModalGasto';
 import ModalEntrada from '../../Components/ModalEntrada';
-import { addMonths, format } from 'date-fns';
+import { format } from 'date-fns';
 
 export default function Home() {
   const [login, setLogin] = useState('');
   const [movements, setMovements] = useState([]);
   const [balance, setBalance] = useState({ saldo: '0', gastos: '0', totalGastos: '0' });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCarteira = async () => {
       try {
-        const carteiraResponse = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+        const carteiraResponse = await axios.get(`http://localhost:8080/user/carteira/${global.userId}`, {
           headers: {
             'Authorization': 'Bearer ' + global.userToken
           }
@@ -35,7 +36,8 @@ export default function Home() {
 
   const fetchMovements = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+      setLoading(true);
+      const response = await axios.get(`http://localhost:8080/user/carteira/${global.userId}`, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }
@@ -73,15 +75,17 @@ export default function Home() {
 
       setMovements(formattedMovements);
       setBalance({
-        saldo: valorDisponivel.toFixed(2), // Atualiza saldo com valorDisponivel
+        saldo: valorDisponivel.toFixed(2),
         gastos: entradas.toFixed(2),
         totalGastos: gastos.toFixed(2)
       });
     } catch (error) {
       console.log('Erro ao obter os movimentos:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os movimentos.');
+    } finally {
+      setLoading(false);
     }
   };
-  
 
   useEffect(() => {
     const fetchLogin = async () => {
@@ -110,14 +114,18 @@ export default function Home() {
         <View style={styles.header}>
           <Text style={styles.title}>Todas as movimentações</Text>
         </View>
-        <FlatList
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
-          data={movements}
-          keyExtractor={(item) => String(item.id)}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => <Movements data={item} />}
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <FlatList
+            style={styles.list}
+            contentContainerStyle={styles.listContent}
+            data={movements}
+            keyExtractor={(item) => String(item.id)}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => <Movements data={item} onSuccess={fetchMovements} />}
+          />
+        )}
       </View>
       <View style={styles.actionsContainer}>
         <Actions />
@@ -138,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
   },
   mainContent: {
-    flex: 1, // Garante que a lista de movimentações ocupe o espaço restante
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
@@ -157,7 +165,7 @@ const styles = StyleSheet.create({
     marginEnd: 14,
   },
   listContent: {
-    paddingBottom: 200, // Adiciona um padding para evitar sobreposição com os botões
+    paddingBottom: 200,
   },
   actionsContainer: {
     flexDirection: 'row',

@@ -105,9 +105,9 @@ export default function ModalEntrada({ onSuccess }) {
               onChangeText={text => setDescricao(text)}
             />
 
-            <Text style={styles.title}>Valor do Gasto:</Text>
+            <Text style={styles.title}>Valor da entrada:</Text>
             <TextInput
-              placeholder='Digite o valor do gasto'
+              placeholder='Digite o valor da entrada'
               style={styles.input}
               value={valorGasto}
               onChangeText={text => setValorGasto(text)}

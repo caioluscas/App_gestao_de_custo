@@ -46,11 +46,11 @@ export default function Grafico() {
       
 
 
-      const { ENTRETERIMENTO, TRANSPORTE, ALIMENTAÇÃO, OUTROS } = response.data;
+      const { ENTRETENIMENTO, TRANSPORTE, ALIMENTAÇÃO, OUTROS } = response.data;
 
       const formattedData = [
         ['Categoria', 'Valor'],
-        ['Entretenimento', Math.abs(ENTRETERIMENTO)],
+        ['Entretenimento', Math.abs(ENTRETENIMENTO)],
         ['Transporte', Math.abs(TRANSPORTE)],
         ['Alimentação', Math.abs(ALIMENTAÇÃO)],
         ['Outros', Math.abs(OUTROS)]

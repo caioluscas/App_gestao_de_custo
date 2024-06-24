@@ -98,7 +98,7 @@ export default function ModalGasto({ onSuccess }) {
   }, [parcelas, valorParcela, eparcela]);
 
   const options = [
-    { value: 'ENTRETERIMENTO', label: 'Entretenimento' },
+    { value: 'ENTRETENIMENTO', label: 'Entretenimento' },
     { value: 'ALIMENTAÇÃO', label: 'Alimentação' },
     { value: 'TRANSPORTE', label: 'Transporte' },
     { value: 'OUTROS', label: 'Outros' }

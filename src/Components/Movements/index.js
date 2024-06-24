@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { MotiView, AnimatePresence, MotiText } from 'moti';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo, faSquarePen, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -12,6 +12,7 @@ export default function Movements({ data, onSuccess }) {
   const [modalDeleteVisible, setModalDeleteVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [infoData, setInfoData] = useState(null);
+  const [newSaldo, setNewSaldo] = useState('');
 
   const dados_delete = {
     id: data.id,
@@ -61,6 +62,29 @@ export default function Movements({ data, onSuccess }) {
     } catch (error) {
       Alert.alert('Erro', 'Erro ao buscar informações. Tente novamente.');
       console.error('Erro ao buscar informações:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = async () => {
+    setLoading(true);
+    const dados_edit = {
+      id: data.id,
+      saldo: newSaldo
+    };
+    try {
+      const response = await axios.put('http://localhost:8080/user', dados_edit, {
+        headers: {
+          'Authorization': 'Bearer ' + global.userToken
+        }
+      });
+      console.log('Resposta do servidor (editar):', response.data);
+      setModalEditVisible(false);
+      onSuccess && onSuccess();
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao editar o saldo. Tente novamente.');
+      console.error('Erro ao editar o saldo:', error);
     } finally {
       setLoading(false);
     }
@@ -159,7 +183,16 @@ export default function Movements({ data, onSuccess }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Editar informações do gasto/entrada:</Text>
-            {/* Adicione aqui os campos para editar as informações */}
+            <TextInput
+              style={styles.input}
+              placeholder="Novo Saldo"
+              value={newSaldo}
+              onChangeText={setNewSaldo}
+              keyboardType="numeric"
+            />
+            <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleEdit}>
+              <Text style={styles.buttonText}>Salvar</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={[styles.button, styles.closeButton]} onPress={() => setModalEditVisible(false)}>
               <Text style={styles.buttonText}>Fechar</Text>
             </TouchableOpacity>
@@ -280,8 +313,20 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: '#C0C0C0',
   },
+  saveButton: {
+    backgroundColor: '#28a745',
+  },
   buttonText: {
     color: '#FFF',
     fontSize: 16,
+  },
+  input: {
+    width: '100%',
+    height: 40,
+    borderColor: '#CCC',
+    borderWidth: 1,
+    borderRadius: 4,
+    marginBottom: 10,
+    paddingLeft: 10,
   },
 });

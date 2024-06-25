@@ -51,7 +51,7 @@ export default function ModalGasto({ onSuccess }) {
       parcelas: eparcela ? parseInt(parcelas) : 0,
       valorParcela: eparcela ? parseFloat(valorParcela) : 0,
       descricao: descricao,
-      Local: local,
+      local: local,
       categoria: categoriaSelecionada ? categoriaSelecionada.value : null,
       dataFutura: isFutureRelease ? futureReleaseDate : null // Adiciona a data futura se for um lançamento futuro
     };

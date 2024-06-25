@@ -3,10 +3,6 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal } from 'reac
 import { PlusCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import Select from 'react-select';
-import DatePicker from "react-datepicker";
-import moment from 'moment'; // Importando Moment.js
-
-import "react-datepicker/dist/react-datepicker.css";
 
 export default function ModalGasto({ onSuccess }) {
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -18,9 +14,8 @@ export default function ModalGasto({ onSuccess }) {
   const [valorGasto, setValorGasto] = useState('');
   const [eparcela, setEParcela] = useState(false);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
-  const [isFutureRelease, setIsFutureRelease] = useState(false); // Estado para lançamento futuro
-  const [futureReleaseDate, setFutureReleaseDate] = useState(new Date()); // Estado para a data de lançamento futuro
-  const [minDate, setMinDate] = useState(new Date()); // Estado para data mínima no DatePicker
+  const [isRecorrente, setIsRecorrente] = useState(false); // Renomeado para recorrência
+  const [periodoRecorrencia, setPeriodoRecorrencia] = useState(''); // Novo estado para período de recorrência
 
   const resetFields = () => {
     setLocal('');
@@ -29,8 +24,8 @@ export default function ModalGasto({ onSuccess }) {
     setValorParcela('');
     setValorGasto('');
     setEParcela(false);
-    setIsFutureRelease(false); // Resetar lançamento futuro
-    setFutureReleaseDate(new Date());
+    setIsRecorrente(false); // Resetar recorrência
+    setPeriodoRecorrencia('');
   };
 
   const handleSalvarGasto = async () => {
@@ -53,8 +48,13 @@ export default function ModalGasto({ onSuccess }) {
       descricao: descricao,
       Local: local,
       categoria: categoriaSelecionada ? categoriaSelecionada.value : null,
-      dataFutura: isFutureRelease ? futureReleaseDate : null // Adiciona a data futura se for um lançamento futuro
     };
+
+    // Verifica se é recorrente e adiciona os campos relevantes
+    if (isRecorrente) {
+      dados.recorrente = true;
+      dados.periodoRecorrencia = parseInt(periodoRecorrencia);
+    }
 
     console.log('Dados a serem enviados:', dados);
 
@@ -70,7 +70,13 @@ export default function ModalGasto({ onSuccess }) {
       const idCarteira = carteiraResponse.data.idCarteira;
       dados.idCarteira = idCarteira;
 
-      const gastoResponse = await axios.post('http://localhost:8080/user/gasto', dados, {
+      let endpoint = 'http://localhost:8080/user/gasto'; // Endpoint padrão
+
+      if (isRecorrente) {
+        endpoint = 'http://localhost:8080/user/carteiraFuturo'; // Endpoint para gastos recorrentes
+      }
+
+      const gastoResponse = await axios.post(endpoint, dados, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }
@@ -106,12 +112,6 @@ export default function ModalGasto({ onSuccess }) {
       setValorGasto(valorCalculado.toString());
     }
   }, [parcelas, valorParcela, eparcela]);
-
-  useEffect(() => {
-    if (modalIsOpen) {
-      setMinDate(new Date()); // Atualiza a data mínima para o dia atual quando o modal é aberto
-    }
-  }, [modalIsOpen]);
 
   const options = [
     { value: 'ENTRETENIMENTO', label: 'Entretenimento' },
@@ -193,7 +193,7 @@ export default function ModalGasto({ onSuccess }) {
                 onPress={() => {
                   setEParcela(!eparcela);
                   if (!eparcela) {
-                    setIsFutureRelease(false);
+                    setIsRecorrente(false);
                   }
                 }}
                 style={[styles.checkbox, eparcela && styles.checkboxSelected]}
@@ -204,23 +204,23 @@ export default function ModalGasto({ onSuccess }) {
 
             {!eparcela && (
               <View style={styles.checkboxContainer}>
-                <Text style={styles.checkboxLabel}>Lançamento futuro?</Text>
+                <Text style={styles.checkboxLabel}>Recorrência?</Text>
                 <TouchableOpacity
-                  onPress={() => setIsFutureRelease(!isFutureRelease)}
-                  style={[styles.checkbox, isFutureRelease && styles.checkboxSelected]}
+                  onPress={() => setIsRecorrente(!isRecorrente)}
+                  style={[styles.checkbox, isRecorrente && styles.checkboxSelected]}
                 >
-                  {isFutureRelease ? <Text style={styles.checkboxText}>✔</Text> : <Text style={styles.checkboxText}>❌</Text>}
+                  {isRecorrente ? <Text style={styles.checkboxText}>✔</Text> : <Text style={styles.checkboxText}>❌</Text>}
                 </TouchableOpacity>
               </View>
             )}
 
-            {isFutureRelease && (
-              <DatePicker
-                placeholder="Selecione uma data"
-                selected={futureReleaseDate}
-                onChange={date => setFutureReleaseDate(date)}
-                minDate={minDate} // Definindo a data mínima
-                dateFormat='dd/MM/yyyy'
+            {isRecorrente && (
+              <TextInput
+                placeholder='Digite o número de meses de recorrência'
+                style={styles.input}
+                value={periodoRecorrencia}
+                onChangeText={text => setPeriodoRecorrencia(text)}
+                keyboardType='numeric'
               />
             )}
 
@@ -256,7 +256,7 @@ export default function ModalGasto({ onSuccess }) {
             <Text style={styles.successMessage}>Cadastrado com sucesso!</Text>
             <TouchableOpacity style={styles.successButton} onPress={fecharPopupSucesso}>
               <Text style={styles.buttonText}>OK</Text>
-              </TouchableOpacity>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>

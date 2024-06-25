@@ -135,9 +135,9 @@ export default function Movements({ data, onSuccess }) {
         <TouchableOpacity onPress={() => setModalInfoVisible(true)}>
           <FontAwesomeIcon icon={faCircleInfo} style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setModalEditVisible(true)}>
+        {/* <TouchableOpacity onPress={() => setModalEditVisible(true)}>
           <FontAwesomeIcon icon={faSquarePen} style={styles.icon} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity onPress={() => setModalDeleteVisible(true)}>
           <FontAwesomeIcon icon={faTrash} style={styles.icon} />
         </TouchableOpacity>

@@ -17,6 +17,8 @@ export default function ModalGasto({ onSuccess }) {
   const [valorParcela, setValorParcela] = useState('');
   const [valorGasto, setValorGasto] = useState('');
   const [eparcela, setEParcela] = useState(false);
+  const [recorrente, setRecorrente] = useState(false);
+  const [periodoRecorrencia, setPeriodoRecorrencia] = useState('');
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
   const [isFutureRelease, setIsFutureRelease] = useState(false); // Estado para lançamento futuro
   const [futureReleaseDate, setFutureReleaseDate] = useState(new Date()); // Estado para a data de lançamento futuro
@@ -29,6 +31,8 @@ export default function ModalGasto({ onSuccess }) {
     setValorParcela('');
     setValorGasto('');
     setEParcela(false);
+    setRecorrente(false);
+    setPeriodoRecorrencia('');
     setIsFutureRelease(false); // Resetar lançamento futuro
     setFutureReleaseDate(new Date());
   };
@@ -53,7 +57,8 @@ export default function ModalGasto({ onSuccess }) {
       descricao: descricao,
       local: local,
       categoria: categoriaSelecionada ? categoriaSelecionada.value : null,
-      dataFutura: isFutureRelease ? futureReleaseDate : null // Adiciona a data futura se for um lançamento futuro
+      recorrente: recorrente,
+      periodoRecorrencia: periodoRecorrencia ? parseInt(periodoRecorrencia) : 0
     };
 
     console.log('Dados a serem enviados:', dados);
@@ -206,7 +211,10 @@ export default function ModalGasto({ onSuccess }) {
               <View style={styles.checkboxContainer}>
                 <Text style={styles.checkboxLabel}>Lançamento futuro?</Text>
                 <TouchableOpacity
-                  onPress={() => setIsFutureRelease(!isFutureRelease)}
+                  onPress={() => {
+                      setRecorrente(!recorrente);
+                      setIsFutureRelease(!isFutureRelease);
+                    }}
                   style={[styles.checkbox, isFutureRelease && styles.checkboxSelected]}
                 >
                   {isFutureRelease ? <Text style={styles.checkboxText}>✔</Text> : <Text style={styles.checkboxText}>❌</Text>}

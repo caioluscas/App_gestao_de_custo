@@ -13,6 +13,8 @@ export default function ModalEntrada({ onSuccess }) {
   const [valorGasto, setValorGasto] = useState('');
   const [isFutureRelease, setIsFutureRelease] = useState(false); // Estado para lançamento futuro
   const [futureReleaseDate, setFutureReleaseDate] = useState(new Date()); // Estado para a data de lançamento futuro
+  const [isRecorrente, setIsRecorrente] = useState(false); // Estado para recorrência
+  const [periodoRecorrencia, setPeriodoRecorrencia] = useState(''); // Estado para o período de recorrência
 
   const resetFields = () => {
     setLocal('');
@@ -20,6 +22,8 @@ export default function ModalEntrada({ onSuccess }) {
     setValorGasto('');
     setIsFutureRelease(false);
     setFutureReleaseDate(new Date());
+    setIsRecorrente(false);
+    setPeriodoRecorrencia('');
   };
 
   const handleSalvarGasto = async () => {
@@ -33,7 +37,9 @@ export default function ModalEntrada({ onSuccess }) {
       valor: valorGasto,
       descricao: descricao,
       local: local,
-      dataFutura: isFutureRelease ? futureReleaseDate : null // Adiciona a data futura se for um lançamento futuro
+      dataFutura: isFutureRelease ? futureReleaseDate : null, // Adiciona a data futura se for um lançamento futuro
+      recorrente: isRecorrente, // Adiciona se é recorrente
+      periodoRecorrencia: isRecorrente ? parseInt(periodoRecorrencia) : null // Adiciona o período de recorrência se for recorrente
     };
 
     console.log('Dados a serem enviados:', dados);
@@ -131,13 +137,33 @@ export default function ModalEntrada({ onSuccess }) {
             </View>
 
             {isFutureRelease && (
-                <DatePicker
-                  selected={futureReleaseDate}
-                  onChange={date => setFutureReleaseDate(date)}
-                  minDate={new Date()} // Seleciona apenas datas a partir de hoje
-                  dateFormat='dd/MM/yyyy'
-                  style={styles.datePicker}
-                />
+              <DatePicker
+                selected={futureReleaseDate}
+                onChange={date => setFutureReleaseDate(date)}
+                minDate={new Date()} // Seleciona apenas datas a partir de hoje
+                dateFormat='dd/MM/yyyy'
+                style={styles.datePicker}
+              />
+            )}
+
+            <View style={styles.checkboxContainer}>
+              <Text style={styles.checkboxLabel}>Recorrência?</Text>
+              <TouchableOpacity
+                onPress={() => setIsRecorrente(!isRecorrente)}
+                style={[styles.checkbox, isRecorrente && styles.checkboxSelected]}
+              >
+                {isRecorrente ? <Text style={styles.checkboxText}>✔</Text> : <Text style={styles.checkboxText}>❌</Text>}
+              </TouchableOpacity>
+            </View>
+
+            {isRecorrente && (
+              <TextInput
+                placeholder='Digite o número de meses de recorrência'
+                style={styles.input}
+                value={periodoRecorrencia}
+                onChangeText={text => setPeriodoRecorrencia(text)}
+                keyboardType='numeric'
+              />
             )}
 
             <View style={styles.buttonsContainer}>

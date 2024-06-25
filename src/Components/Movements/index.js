@@ -126,9 +126,9 @@ export default function Movements({ data, onSuccess }) {
         <TouchableOpacity onPress={() => setModalInfoVisible(true)}>
           <FontAwesomeIcon icon={faCircleInfo} style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setModalEditVisible(true)}>
+        {/* <TouchableOpacity onPress={() => setModalEditVisible(true)}>
           <FontAwesomeIcon icon={faSquarePen} style={styles.icon} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity onPress={() => setModalDeleteVisible(true)}>
           <FontAwesomeIcon icon={faTrash} style={styles.icon} />
         </TouchableOpacity>
@@ -160,7 +160,7 @@ export default function Movements({ data, onSuccess }) {
       </Modal>
 
       {/* Modal de edição */}
-      <Modal visible={modalEditVisible} animationType="slide" onRequestClose={() => setModalEditVisible(false)}>
+       <Modal visible={modalEditVisible} animationType="slide" onRequestClose={() => setModalEditVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Editar informações do gasto/entrada:</Text>
@@ -179,7 +179,7 @@ export default function Movements({ data, onSuccess }) {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      </Modal> 
 
       {/* Modal de deletar */}
       <Modal visible={modalDeleteVisible} animationType="slide" onRequestClose={() => setModalDeleteVisible(false)}>

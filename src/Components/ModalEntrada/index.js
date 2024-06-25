@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal } from 'react-native';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 export default function ModalEntrada({ onSuccess }) {
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -11,15 +9,12 @@ export default function ModalEntrada({ onSuccess }) {
   const [local, setLocal] = useState('');
   const [descricao, setDescricao] = useState('');
   const [valorGasto, setValorGasto] = useState('');
-  const [isFutureRelease, setIsFutureRelease] = useState(false); // Estado para lançamento futuro
-  const [futureReleaseDate, setFutureReleaseDate] = useState(new Date()); // Estado para a data de lançamento futuro
+  
 
   const resetFields = () => {
     setLocal('');
     setDescricao('');
     setValorGasto('');
-    setIsFutureRelease(false);
-    setFutureReleaseDate(new Date());
   };
 
   const handleSalvarGasto = async () => {
@@ -33,7 +28,6 @@ export default function ModalEntrada({ onSuccess }) {
       valor: valorGasto,
       descricao: descricao,
       local: local,
-      dataFutura: isFutureRelease ? futureReleaseDate : null // Adiciona a data futura se for um lançamento futuro
     };
 
     console.log('Dados a serem enviados:', dados);
@@ -120,35 +114,13 @@ export default function ModalEntrada({ onSuccess }) {
               keyboardType='decimal-pad'
             />
 
-            <View style={styles.checkboxContainer}>
-              <Text style={styles.checkboxLabel}>Lançamento futuro?</Text>
-              <TouchableOpacity
-                onPress={() => setIsFutureRelease(!isFutureRelease)}
-                style={[styles.checkbox, isFutureRelease && styles.checkboxSelected]}
-              >
-                {isFutureRelease ? <Text style={styles.checkboxText}>✔</Text> : <Text style={styles.checkboxText}>❌</Text>}
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.button} onPress={handleSalvarGasto}>
+              <Text style={styles.buttonText}>Salvar</Text>
+            </TouchableOpacity>
 
-            {isFutureRelease && (
-                <DatePicker
-                  selected={futureReleaseDate}
-                  onChange={date => setFutureReleaseDate(date)}
-                  minDate={new Date()} // Seleciona apenas datas a partir de hoje
-                  dateFormat='dd/MM/yyyy'
-                  style={styles.datePicker}
-                />
-            )}
-
-            <View style={styles.buttonsContainer}>
-              <TouchableOpacity style={styles.button} onPress={handleSalvarGasto}>
-                <Text style={styles.buttonText}>Salvar</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.buttonCancelar} onPress={fecharModal}>
-                <Text style={styles.buttonText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.buttonCancelar} onPress={fecharModal}>
+              <Text style={styles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -221,19 +193,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     padding: 10,
   },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 20,
-  },
   button: {
     backgroundColor: '#198754',
     borderRadius: 4,
     paddingVertical: 10,
     paddingHorizontal: 20,
+    marginTop: 20,
     alignItems: 'center',
-    width: '45%',
+    width: '100%',
   },
   buttonText: {
     color: '#FFF',
@@ -245,8 +212,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingVertical: 10,
     paddingHorizontal: 20,
+    marginTop: 10,
     alignItems: 'center',
-    width: '45%',
+    width: '100%',
   },
   popupOverlay: {
     flex: 1,
@@ -272,33 +240,5 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     alignItems: 'center',
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  checkboxLabel: {
-    fontSize: 16,
-    marginRight: 10,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxSelected: {
-    backgroundColor: '#198754',
-  },
-  checkboxText: {
-    color: '#FFF',
-    fontSize: 14,
-  },
-  datePicker: {
-    marginTop: 10,
-    width: '100%',
   },
 });

@@ -19,6 +19,15 @@ export default function Movements({ data, onSuccess }) {
     idCarteira: global.idCarteira
   };
 
+  // Função para formatar a data
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const handleDelete = async () => {
     setLoading(true);
     const endpoint = data.type === 1 ? 'entrada' : 'gasto';
@@ -143,12 +152,21 @@ export default function Movements({ data, onSuccess }) {
               <ActivityIndicator size="large" color="#0000ff" />
             ) : infoData ? (
               <>
-                <Text>Categoria: {infoData.categoria}</Text>
+                <Text>Categoria: {infoData.listaDeMovimentacoes[data.id - 1].categoria}</Text>
                 <Text>Data: {data.date}</Text>
+                <Text>Local: {infoData.listaDeMovimentacoes[data.id - 1].local}</Text>
                 <Text>Descrição: {data.label}</Text>
                 <Text>Valor: {data.type === 1 ? `R$ ${data.value}` : `R$ -${data.value}`}</Text>
-                <Text>ID da Carteira: {infoData.idCarteira}</Text>
-                <Text>Saldo: R$ {infoData.saldo}</Text>
+                {infoData.listaDeMovimentacoes[data.id - 1].eparcela && (
+                  <>
+                    <Text>Parcelas: {infoData.listaDeMovimentacoes[data.id - 1].parcelas}</Text>
+                    <Text>Parcela atual: {infoData.listaDeMovimentacoes[data.id - 1].parcelaAtual}</Text>
+                    <Text>Parcelas restantes: {infoData.listaDeMovimentacoes[data.id - 1].parcelaRestante}</Text>
+                    <Text>Valor da parcela: {infoData.listaDeMovimentacoes[data.id - 1].valorParcela}</Text>
+                    <Text>Data próxima parcela: {formatDate(infoData.listaDeMovimentacoes[data.id - 1].dataProxParcela)}</Text>
+                    <Text>Data última parcela: {formatDate(infoData.listaDeMovimentacoes[data.id - 1].dataUltimaParcela)}</Text>
+                  </>
+                )}
               </>
             ) : (
               <Text>Carregando...</Text>
@@ -282,6 +300,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
+    margin: 5,
     borderRadius: 4,
     paddingVertical: 10,
     paddingHorizontal: 20,

@@ -3,6 +3,10 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal } from 'reac
 import { PlusCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import Select from 'react-select';
+import DatePicker from "react-datepicker";
+import moment from 'moment'; // Importando Moment.js
+
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function ModalGasto({ onSuccess }) {
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -14,6 +18,9 @@ export default function ModalGasto({ onSuccess }) {
   const [valorGasto, setValorGasto] = useState('');
   const [eparcela, setEParcela] = useState(false);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
+  const [isFutureRelease, setIsFutureRelease] = useState(false); // Estado para lançamento futuro
+  const [futureReleaseDate, setFutureReleaseDate] = useState(new Date()); // Estado para a data de lançamento futuro
+  const [minDate, setMinDate] = useState(new Date()); // Estado para data mínima no DatePicker
 
   const resetFields = () => {
     setLocal('');
@@ -22,6 +29,8 @@ export default function ModalGasto({ onSuccess }) {
     setValorParcela('');
     setValorGasto('');
     setEParcela(false);
+    setIsFutureRelease(false); // Resetar lançamento futuro
+    setFutureReleaseDate(new Date());
   };
 
   const handleSalvarGasto = async () => {
@@ -43,7 +52,8 @@ export default function ModalGasto({ onSuccess }) {
       valorParcela: eparcela ? parseFloat(valorParcela) : 0,
       descricao: descricao,
       local: local,
-      categoria: categoriaSelecionada ? categoriaSelecionada.value : null
+      categoria: categoriaSelecionada ? categoriaSelecionada.value : null,
+      dataFutura: isFutureRelease ? futureReleaseDate : null // Adiciona a data futura se for um lançamento futuro
     };
 
     console.log('Dados a serem enviados:', dados);
@@ -96,6 +106,12 @@ export default function ModalGasto({ onSuccess }) {
       setValorGasto(valorCalculado.toString());
     }
   }, [parcelas, valorParcela, eparcela]);
+
+  useEffect(() => {
+    if (modalIsOpen) {
+      setMinDate(new Date()); // Atualiza a data mínima para o dia atual quando o modal é aberto
+    }
+  }, [modalIsOpen]);
 
   const options = [
     { value: 'ENTRETENIMENTO', label: 'Entretenimento' },
@@ -174,12 +190,39 @@ export default function ModalGasto({ onSuccess }) {
             <View style={styles.checkboxContainer}>
               <Text style={styles.checkboxLabel}>Compra parcelada?</Text>
               <TouchableOpacity
-                onPress={() => setEParcela(!eparcela)}
+                onPress={() => {
+                  setEParcela(!eparcela);
+                  if (!eparcela) {
+                    setIsFutureRelease(false);
+                  }
+                }}
                 style={[styles.checkbox, eparcela && styles.checkboxSelected]}
               >
                 {eparcela ? <Text style={styles.checkboxText}>✔</Text> : <Text style={styles.checkboxText}>❌</Text>}
               </TouchableOpacity>
             </View>
+
+            {!eparcela && (
+              <View style={styles.checkboxContainer}>
+                <Text style={styles.checkboxLabel}>Lançamento futuro?</Text>
+                <TouchableOpacity
+                  onPress={() => setIsFutureRelease(!isFutureRelease)}
+                  style={[styles.checkbox, isFutureRelease && styles.checkboxSelected]}
+                >
+                  {isFutureRelease ? <Text style={styles.checkboxText}>✔</Text> : <Text style={styles.checkboxText}>❌</Text>}
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {isFutureRelease && (
+              <DatePicker
+                placeholder="Selecione uma data"
+                selected={futureReleaseDate}
+                onChange={date => setFutureReleaseDate(date)}
+                minDate={minDate} // Definindo a data mínima
+                dateFormat='dd/MM/yyyy'
+              />
+            )}
 
             <Text style={styles.title}>Valor do Gasto:</Text>
             <TextInput
@@ -213,7 +256,7 @@ export default function ModalGasto({ onSuccess }) {
             <Text style={styles.successMessage}>Cadastrado com sucesso!</Text>
             <TouchableOpacity style={styles.successButton} onPress={fecharPopupSucesso}>
               <Text style={styles.buttonText}>OK</Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
           </View>
         </View>
       </Modal>

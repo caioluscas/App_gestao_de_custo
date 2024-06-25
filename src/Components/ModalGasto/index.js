@@ -48,13 +48,9 @@ export default function ModalGasto({ onSuccess }) {
       descricao: descricao,
       local: local,
       categoria: categoriaSelecionada ? categoriaSelecionada.value : null,
+      recorrente: isRecorrente,
+      periodoRecorrencia: isRecorrente ? parseInt(periodoRecorrencia) : 0,
     };
-
-    // Verifica se é recorrente e adiciona os campos relevantes
-    if (isRecorrente) {
-      dados.recorrente = true;
-      dados.periodoRecorrencia = parseInt(periodoRecorrencia);
-    }
 
     console.log('Dados a serem enviados:', dados);
 
@@ -70,13 +66,7 @@ export default function ModalGasto({ onSuccess }) {
       const idCarteira = carteiraResponse.data.idCarteira;
       dados.idCarteira = idCarteira;
 
-      let endpoint = 'http://localhost:8080/user/gasto'; // Endpoint padrão
-
-      if (isRecorrente) {
-        endpoint = 'http://localhost:8080/user/carteiraFuturo'; // Endpoint para gastos recorrentes
-      }
-
-      const gastoResponse = await axios.post(endpoint, dados, {
+      const gastoResponse = await axios.post('http://localhost:8080/user/gasto', dados, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }

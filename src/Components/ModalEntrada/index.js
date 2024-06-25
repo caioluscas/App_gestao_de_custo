@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal } from 'react-native';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 export default function ModalEntrada({ onSuccess }) {
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -11,17 +9,13 @@ export default function ModalEntrada({ onSuccess }) {
   const [local, setLocal] = useState('');
   const [descricao, setDescricao] = useState('');
   const [valorGasto, setValorGasto] = useState('');
-  const [isFutureRelease, setIsFutureRelease] = useState(false); // Estado para lançamento futuro
-  const [futureReleaseDate, setFutureReleaseDate] = useState(new Date()); // Estado para a data de lançamento futuro
-  const [isRecorrente, setIsRecorrente] = useState(false); // Estado para recorrência
-  const [periodoRecorrencia, setPeriodoRecorrencia] = useState(''); // Estado para o período de recorrência
+  const [isRecorrente, setIsRecorrente] = useState(false);
+  const [periodoRecorrencia, setPeriodoRecorrencia] = useState('');
 
   const resetFields = () => {
     setLocal('');
     setDescricao('');
     setValorGasto('');
-    setIsFutureRelease(false);
-    setFutureReleaseDate(new Date());
     setIsRecorrente(false);
     setPeriodoRecorrencia('');
   };
@@ -37,9 +31,8 @@ export default function ModalEntrada({ onSuccess }) {
       valor: valorGasto,
       descricao: descricao,
       local: local,
-      dataFutura: isFutureRelease ? futureReleaseDate : null, // Adiciona a data futura se for um lançamento futuro
-      recorrente: isRecorrente, // Adiciona se é recorrente
-      periodoRecorrencia: isRecorrente ? parseInt(periodoRecorrencia) : null // Adiciona o período de recorrência se for recorrente
+      recorrente: isRecorrente,
+      periodoRecorrencia: isRecorrente ? parseInt(periodoRecorrencia) : null
     };
 
     console.log('Dados a serem enviados:', dados);
@@ -125,26 +118,6 @@ export default function ModalEntrada({ onSuccess }) {
               onChangeText={text => setValorGasto(text)}
               keyboardType='decimal-pad'
             />
-
-            <View style={styles.checkboxContainer}>
-              <Text style={styles.checkboxLabel}>Lançamento futuro?</Text>
-              <TouchableOpacity
-                onPress={() => setIsFutureRelease(!isFutureRelease)}
-                style={[styles.checkbox, isFutureRelease && styles.checkboxSelected]}
-              >
-                {isFutureRelease ? <Text style={styles.checkboxText}>✔</Text> : <Text style={styles.checkboxText}>❌</Text>}
-              </TouchableOpacity>
-            </View>
-
-            {isFutureRelease && (
-              <DatePicker
-                selected={futureReleaseDate}
-                onChange={date => setFutureReleaseDate(date)}
-                minDate={new Date()} // Seleciona apenas datas a partir de hoje
-                dateFormat='dd/MM/yyyy'
-                style={styles.datePicker}
-              />
-            )}
 
             <View style={styles.checkboxContainer}>
               <Text style={styles.checkboxLabel}>Recorrência?</Text>
@@ -322,9 +295,5 @@ const styles = StyleSheet.create({
   checkboxText: {
     color: '#FFF',
     fontSize: 14,
-  },
-  datePicker: {
-    marginTop: 10,
-    width: '100%',
   },
 });

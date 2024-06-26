@@ -16,7 +16,7 @@ const LancamentosFuturos = () => {
 
   const fetchFutureReleases = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+      const response = await axios.get(`http://localhost:8080/user/carteiraFuturo/${global.userId}/dias=30`, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }
@@ -25,20 +25,23 @@ const LancamentosFuturos = () => {
       const { listaDeMovimentacoes } = response.data;
 
       // Filtrar e formatar os dados de lançamentos futuros
-      const formattedFutureReleases = listaDeMovimentacoes.flatMap(mov => {
-        const parcelasRestantes = [];
+      const formattedFutureReleases = listaDeMovimentacoes.map(mov => {
         if (mov.eparcela) {
-          for (let i = 1; i <= mov.parcelaRestante; i++) {
-            parcelasRestantes.push({
-              id: `${mov.id}-${i}`,
-              label: `${mov.descricao} ${mov.parcelaAtual + i}/${mov.parcelas}`,
-              value: Math.abs(mov.valorParcela).toFixed(2),
-              date: format(addMonths(new Date(mov.dataEntrada), mov.parcelaAtual + i - 1), 'dd/MM/yyyy')
-            });
-          }
+          return Array.from({ length: mov.parcelaRestante }, (_, i) => ({
+            id: `${mov.id}-${i + 1}`,
+            label: `${mov.descricao} ${mov.parcelaAtual + i + 1}/${mov.parcelas}`,
+            value: Math.abs(mov.valorParcela).toFixed(2),
+            date: format(addMonths(new Date(mov.dataEntrada), mov.parcelaAtual + i), 'dd/MM/yyyy')
+          }));
+        } else {
+          return {
+            id: mov.id,
+            label: mov.descricao,
+            value: Math.abs(mov.valor).toFixed(2),
+            date: format(new Date(mov.dataEntrada), 'dd/MM/yyyy')
+          };
         }
-        return parcelasRestantes;
-      });
+      }).flat();
 
       setFutureReleases(formattedFutureReleases);
     } catch (error) {

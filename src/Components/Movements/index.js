@@ -160,7 +160,7 @@ export default function Movements({ data, onSuccess }) {
       </Modal>
 
       {/* Modal de edição */}
-       <Modal visible={modalEditVisible} animationType="slide" onRequestClose={() => setModalEditVisible(false)}>
+      <Modal visible={modalEditVisible} animationType="slide" onRequestClose={() => setModalEditVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Editar informações do gasto/entrada:</Text>
@@ -179,7 +179,7 @@ export default function Movements({ data, onSuccess }) {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal> 
+      </Modal>
 
       {/* Modal de deletar */}
       <Modal visible={modalDeleteVisible} animationType="slide" onRequestClose={() => setModalDeleteVisible(false)}>
@@ -210,37 +210,38 @@ export default function Movements({ data, onSuccess }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     marginBottom: 24,
     borderBottomWidth: 0.5,
     borderBottomColor: '#DADADA',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   content: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 2,
-    marginBottom: 8,
+    alignItems: 'center',
   },
   date: {
     color: '#DADADA',
-    fontWeight: 'bold',
+    fontSize: 12,
+    marginBottom: 4,
   },
   label: {
-    fontWeight: 'bold',
     fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
   },
   value: {
     fontSize: 16,
-    color: '#2ecc71',
     fontWeight: 'bold',
+    color: '#2ecc71',
   },
   expenses: {
     fontSize: 16,
-    color: '#e74c3c',
     fontWeight: 'bold',
+    color: '#e74c3c',
   },
   skeleton: {
-    marginTop: 6,
     width: 80,
     height: 10,
     backgroundColor: '#DADADA',
@@ -248,12 +249,12 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginTop: 10,
+    marginTop: 8,
   },
   icon: {
     fontSize: 24,
-    marginRight: 10,
+    marginRight: 16,
+    color: '#333',
   },
   modalOverlay: {
     flex: 1,
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -282,10 +283,10 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 4,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    width: '45%',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     alignItems: 'center',
+    marginBottom: 12,
   },
   closeButton: {
     backgroundColor: '#dc3545',
@@ -299,6 +300,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFF',
     fontSize: 16,
+    fontWeight: 'bold',
   },
   input: {
     width: '100%',
@@ -306,7 +308,7 @@ const styles = StyleSheet.create({
     borderColor: '#CCC',
     borderWidth: 1,
     borderRadius: 4,
-    marginBottom: 10,
-    paddingLeft: 10,
+    marginBottom: 16,
+    paddingHorizontal: 12,
   },
 });

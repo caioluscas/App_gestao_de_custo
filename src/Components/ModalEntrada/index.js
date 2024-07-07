@@ -27,7 +27,7 @@ export default function ModalEntrada({ onSuccess }) {
     }
 
     const dados = {
-      idCarteira: 1,
+      idCarteira: global.userId,
       valor: valorGasto,
       descricao: descricao,
       local: local,

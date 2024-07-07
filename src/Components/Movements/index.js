@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert, CheckBox } from 'react-native';
 import { MotiView, AnimatePresence, MotiText } from 'moti';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo, faSquarePen, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -13,10 +13,13 @@ export default function Movements({ data, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [infoData, setInfoData] = useState(null);
   const [newSaldo, setNewSaldo] = useState('');
+  const [excluirRecorrencia, setExcluirRecorrencia] = useState(false); // Novo estado para a checkbox
 
   const dados_delete = {
     id: data.id,
-    idCarteira: global.idCarteira
+    idCarteira: global.idCarteira,
+    recorrente: excluirRecorrencia,
+    excluirTodos: false // Use o valor do estado da checkbox
   };
 
   const handleDelete = async () => {
@@ -186,10 +189,17 @@ export default function Movements({ data, onSuccess }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Confirmar exclusão:</Text>
-            <Text>Tem certeza de que deseja excluir este gasto/entrada?</Text>
+            <View style={styles.checkboxContainer}>
+              <CheckBox
+                value={excluirRecorrencia}
+                onValueChange={setExcluirRecorrencia}
+                style={styles.checkbox}
+              />
+              <Text>Excluir recorrência caso tenha?</Text>
+            </View>
             <View style={styles.buttonRow}>
               <TouchableOpacity
-                style={[styles.button, styles.closeButton]}
+                style={[styles.button, styles.deleteButton]}
                 onPress={handleDelete}
               >
                 <Text style={styles.buttonText}>Excluir</Text>
@@ -288,7 +298,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  closeButton: {
+  deleteButton: {
     backgroundColor: '#dc3545',
   },
   cancelButton: {
@@ -310,5 +320,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 16,
     paddingHorizontal: 12,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkbox: {
+    marginRight: 8,
   },
 });

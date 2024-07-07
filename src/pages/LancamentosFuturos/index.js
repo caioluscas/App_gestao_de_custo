@@ -5,50 +5,43 @@ import axios from 'axios';
 import { format, addMonths } from 'date-fns';
 import { useNavigation } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
-
 const LancamentosFuturos = () => {
   const [futureReleases, setFutureReleases] = useState([]);
   const navigation = useNavigation();
-
   useEffect(() => {
     fetchFutureReleases();
   }, []);
 
   const fetchFutureReleases = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/user/carteiraFuturo/${global.userId}/dias=30`, {
+      const response = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }
       });
-
       const { listaDeMovimentacoes } = response.data;
 
       // Filtrar e formatar os dados de lançamentos futuros
-      const formattedFutureReleases = listaDeMovimentacoes.map(mov => {
+      const formattedFutureReleases = listaDeMovimentacoes.flatMap(mov => {
+        const parcelasRestantes = [];
         if (mov.eparcela) {
-          return Array.from({ length: mov.parcelaRestante }, (_, i) => ({
-            id: `${mov.id}-${i + 1}`,
-            label: `${mov.descricao} ${mov.parcelaAtual + i + 1}/${mov.parcelas}`,
-            value: Math.abs(mov.valorParcela).toFixed(2),
-            date: format(addMonths(new Date(mov.dataEntrada), mov.parcelaAtual + i), 'dd/MM/yyyy')
-          }));
-        } else {
-          return {
-            id: mov.id,
-            label: mov.descricao,
-            value: Math.abs(mov.valor).toFixed(2),
-            date: format(new Date(mov.dataEntrada), 'dd/MM/yyyy')
-          };
+          for (let i = 1; i <= mov.parcelaRestante; i++) {
+            parcelasRestantes.push({
+              id: `${mov.id}-${i}`,
+              label: `${mov.descricao} ${mov.parcelaAtual + i}/${mov.parcelas}`,
+              value: Math.abs(mov.valorParcela).toFixed(2),
+              date: format(addMonths(new Date(mov.dataEntrada), mov.parcelaAtual + i - 1), 'dd/MM/yyyy')
+            });
+          }
         }
-      }).flat();
+        return parcelasRestantes;
+      });
 
       setFutureReleases(formattedFutureReleases);
     } catch (error) {
       console.log('Erro ao obter lançamentos futuros:', error);
     }
   };
-
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -57,11 +50,9 @@ const LancamentosFuturos = () => {
       >
         <AntDesign name="arrowleft" size={24} color="black" />
       </TouchableOpacity>
-
       <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
         <Text style={styles.title}>Lançamentos Futuros</Text>
       </Animatable.View>
-
       <FlatList
         style={styles.list}
         data={futureReleases}

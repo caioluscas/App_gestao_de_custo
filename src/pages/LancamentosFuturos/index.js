@@ -1,71 +1,91 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { AntDesign } from '@expo/vector-icons'; 
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
 import axios from 'axios';
-import { format, addMonths } from 'date-fns';
+import { format } from 'date-fns';
 import { useNavigation } from '@react-navigation/native';
-import * as Animatable from 'react-native-animatable';
+
 const LancamentosFuturos = () => {
   const [futureReleases, setFutureReleases] = useState([]);
+  const [days, setDays] = useState('');
   const navigation = useNavigation();
+
   useEffect(() => {
     fetchFutureReleases();
-  }, []);
+  }, [days]);
 
   const fetchFutureReleases = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/user/carteira/' + global.userId, {
+      const response = await axios.get(`http://localhost:8080/user/carteiraFuturo/${global.userId}/dias=${days}`, {
         headers: {
           'Authorization': 'Bearer ' + global.userToken
         }
       });
-      const { listaDeMovimentacoes } = response.data;
 
-      // Filtrar e formatar os dados de lançamentos futuros
-      const formattedFutureReleases = listaDeMovimentacoes.flatMap(mov => {
-        const parcelasRestantes = [];
-        if (mov.eparcela) {
-          for (let i = 1; i <= mov.parcelaRestante; i++) {
-            parcelasRestantes.push({
-              id: `${mov.id}-${i}`,
-              label: `${mov.descricao} ${mov.parcelaAtual + i}/${mov.parcelas}`,
-              value: Math.abs(mov.valorParcela).toFixed(2),
-              date: format(addMonths(new Date(mov.dataEntrada), mov.parcelaAtual + i - 1), 'dd/MM/yyyy')
-            });
-          }
-        }
-        return parcelasRestantes;
-      });
+      const releases = response.data;
+      console.log('Resposta da API:', JSON.stringify(releases, null, 2));
 
-      setFutureReleases(formattedFutureReleases);
+      let releasesArray = [];
+
+      if (releases.listaDeMovimentacoes && Array.isArray(releases.listaDeMovimentacoes)) {
+        releasesArray = releases.listaDeMovimentacoes;
+      } else {
+        console.log('Erro: Estrutura inesperada de resposta da API');
+      }
+
+      const formattedReleases = releasesArray.map(release => ({
+        id: release.id,
+        label: release.descricao,
+        value: Math.abs(release.valor).toFixed(2),
+        date: format(new Date(release.dataEntrada), 'dd/MM/yyyy')
+      }));
+
+      setFutureReleases(formattedReleases);
     } catch (error) {
       console.log('Erro ao obter lançamentos futuros:', error);
     }
   };
+
+  const handleBackPress = () => {
+    navigation.navigate('Home');
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.navigate('Home')}
-      >
+      <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
         <AntDesign name="arrowleft" size={24} color="black" />
       </TouchableOpacity>
-      <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
+
+      <View style={styles.containerHeader}>
         <Text style={styles.title}>Lançamentos Futuros</Text>
-      </Animatable.View>
+        <View style={styles.daysContainer}>
+          <Text style={styles.daysLabel}>Informe os dias:</Text>
+          <TextInput
+            style={styles.daysInput}
+            keyboardType="numeric"
+            onChangeText={setDays}
+            value={days}
+            placeholder="inserir"
+          />
+        </View>
+      </View>
+
       <FlatList
-        style={styles.list}
         data={futureReleases}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={item => String(item.id)}
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Text style={styles.date}>{item.date}</Text>
-            <Text style={styles.label}>{item.label}</Text>
+            <View>
+              <Text style={styles.date}>{item.date}</Text>
+              <Text style={styles.label}>{item.label}</Text>
+            </View>
             <Text style={styles.value}>R$ {item.value}</Text>
           </View>
         )}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={<Text>Nenhum lançamento futuro encontrado.</Text>}
+        ListEmptyComponent={() => (
+          <Text>Nenhum lançamento futuro encontrado.</Text>
+        )}
       />
     </View>
   );
@@ -74,44 +94,62 @@ const LancamentosFuturos = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50, 
-    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingHorizontal: 20
   },
   backButton: {
     padding: 10,
     backgroundColor: 'lightgrey',
     borderRadius: 5,
-    marginBottom: 20, 
+    marginBottom: 20
   },
   containerHeader: {
     marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
+  },
+  daysContainer: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  daysLabel: {
+    fontSize: 16,
+    marginRight: 5
+  },
+  daysInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5
   },
   list: {
-    flex: 1,
+    flex: 1
   },
   item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#ccc'
   },
   date: {
     fontSize: 16,
-    color: '#666',
+    color: '#666'
   },
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   value: {
     fontSize: 16,
-    color: '#e74c3c',
-  },
+    color: '#e74c3c'
+  }
 });
 
 export default LancamentosFuturos;

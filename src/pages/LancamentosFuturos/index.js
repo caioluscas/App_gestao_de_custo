@@ -37,7 +37,8 @@ const LancamentosFuturos = () => {
         id: release.id,
         label: release.descricao,
         value: Math.abs(release.valor).toFixed(2),
-        date: format(new Date(release.dataEntrada), 'dd/MM/yyyy')
+        date: format(new Date(release.dataEntrada), 'dd/MM/yyyy'),
+        type: release.valor >= 0 ? 1 : 2 // Considerando que valores positivos são entradas e negativos são saídas
       }));
 
       setFutureReleases(formattedReleases);
@@ -79,7 +80,7 @@ const LancamentosFuturos = () => {
               <Text style={styles.date}>{item.date}</Text>
               <Text style={styles.label}>{item.label}</Text>
             </View>
-            <Text style={styles.value}>R$ {item.value}</Text>
+            <Text style={item.type === 1 ? styles.valueEntry : styles.valueExit}>R$ {item.type === 1 ? item.value : `-${item.value}`}</Text>
           </View>
         )}
         showsVerticalScrollIndicator={false}
@@ -146,9 +147,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold'
   },
-  value: {
+  valueEntry: {
     fontSize: 16,
-    color: '#e74c3c'
+    color: '#2ecc71' // Verde para entradas
+  },
+  valueExit: {
+    fontSize: 16,
+    color: '#e74c3c' // Vermelho para saídas
   }
 });
 
